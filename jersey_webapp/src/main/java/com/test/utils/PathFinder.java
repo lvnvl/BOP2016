@@ -36,13 +36,13 @@ public class PathFinder {
 		JSONArray twoHopArray = get2HopPaths();
 		JSONArray triHopArray = get3HopPaths();
 		JSONArray resultArray = new JSONArray();
-		if(null != oneHopArray){
+		if(0 != oneHopArray.length()){
 			resultArray.put(oneHopArray);
 		}
-		if(null != twoHopArray){
+		if(0 != twoHopArray.length()){
 			resultArray.put(twoHopArray);
 		}
-		if(null != triHopArray){
+		if(0 != triHopArray.length()){
 			resultArray.put(triHopArray);
 		}
 		return resultArray;
@@ -93,8 +93,16 @@ public class PathFinder {
 		return jsonArray;
 	}
 
-	public JSONObject httpService(URI uri) {
+	public JSONObject httpService(String exp) {
+		URIBuilder builder;
 		try{
+			builder = new URIBuilder("https://oxfordhk.azure-api.net/academic/v1.0/evaluate");
+			builder.setParameter("expr", exp);
+	        builder.setParameter("model", "latest");
+	        builder.setParameter("count", "10000");
+	        builder.setParameter("attributes", "Id,AA.AuId,AA.AfId,F.FId,J.JId,C.CId,RId");
+	        builder.setParameter("subscription-key", Constant.subscribeKey);
+	        URI uri = builder.build();
 			HttpClient httpclient = HttpClients.createDefault();
 			
 			HttpGet request = new HttpGet(uri);
@@ -132,20 +140,19 @@ public class PathFinder {
 	}
 
 	public void setaIsID(int id){
-		URIBuilder builder;
+//		URIBuilder builder;
 		try {
-			builder = new URIBuilder("https://oxfordhk.azure-api.net/academic/v1.0/evaluate");
-			builder.setParameter("expr", "Composite(AA.AuId="+id+")");
-	        builder.setParameter("model", "latest");
-	        builder.setParameter("count", "10000");
-	        builder.setParameter("attributes", "Id");
-	        builder.setParameter("subscription-key", Constant.subscribeKey);
-	        URI uri = builder.build();
-
-//	        System.out.println("uri is: "+uri.toASCIIString());
-	        
-	        JSONObject responseJson = httpService(uri);
-//	        System.out.println(responseJson.toString());
+//			builder = new URIBuilder("https://oxfordhk.azure-api.net/academic/v1.0/evaluate");
+//			builder.setParameter("expr", "Composite(AA.AuId="+id+")");
+//	        builder.setParameter("model", "latest");
+//	        builder.setParameter("count", "10000");
+//	        builder.setParameter("attributes", "Id");
+//	        builder.setParameter("subscription-key", Constant.subscribeKey);
+//	        URI uri = builder.build();
+			
+			String expr = "Composite(AA.AuId="+id+")";
+	        JSONObject responseJson = httpService(expr);
+	        System.out.println(responseJson.toString());
 	        if(responseJson.getJSONArray("entities").length() == 0){
 	        	this.aIsID = true;
 	        }
@@ -160,17 +167,18 @@ public class PathFinder {
 	}
 
 	public void setbIsID(int id) {
-		URIBuilder builder;
+//		URIBuilder builder;
 		try {
-			builder = new URIBuilder("https://oxfordhk.azure-api.net/academic/v1.0/evaluate");
-			builder.setParameter("expr", "Composite(AA.AuId="+id+")");
-	        builder.setParameter("model", "latest");
-	        builder.setParameter("count", "10000");
-	        builder.setParameter("attributes", "Id");
-	        builder.setParameter("subscription-key", Constant.subscribeKey);
-	        URI uri = builder.build();
+//			builder = new URIBuilder("https://oxfordhk.azure-api.net/academic/v1.0/evaluate");
+//			builder.setParameter("expr", "Composite(AA.AuId="+id+")");
+//	        builder.setParameter("model", "latest");
+//	        builder.setParameter("count", "10000");
+//	        builder.setParameter("attributes", "Id");
+//	        builder.setParameter("subscription-key", Constant.subscribeKey);
+//	        URI uri = builder.build();
 
-	        JSONObject responseJson = httpService(uri);
+	        String expr = "Composite(AA.AuId="+id+")";
+	        JSONObject responseJson = httpService(expr);
 	        if(responseJson.getJSONArray("entities").length() == 0){
 	        	this.bIsID = true;
 	        }
