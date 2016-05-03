@@ -10,7 +10,9 @@ import org.apache.http.client.utils.URIBuilder;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.util.EntityUtils;
 import org.codehaus.jettison.json.JSONArray;
+import org.codehaus.jettison.json.JSONException;
 import org.codehaus.jettison.json.JSONObject;
+
 
 public class PathFinder {
 	
@@ -45,6 +47,8 @@ public class PathFinder {
 		if(0 != triHopArray.length()){
 			resultArray.put(triHopArray);
 		}
+		
+		System.out.println("cost :"+(System.currentTimeMillis()-startTime)+"ms");
 		return resultArray;
 	}
 
@@ -82,11 +86,66 @@ public class PathFinder {
 		// TODO Auto-generated method stub
 		JSONArray jsonArray = new JSONArray();
 		if(aIsID && bIsID){           //A case:[Id,Id]
-			
+			JSONObject ajson = httpService("Id="+a);
+			JSONObject bjson = httpService("Id="+b);
+			System.out.println("a:"+ajson.toString()+"\nb:"+bjson.toString());
+			JSONArray aRidArray = new JSONArray();
+			JSONArray bRidArray = new JSONArray();
+			try {
+				aRidArray = ajson.getJSONArray("entities").getJSONObject(0).getJSONArray("RId");
+				bRidArray = bjson.getJSONArray("entities").getJSONObject(0).getJSONArray("RId");
+				boolean pass = false;
+				for(int i = 0;i < aRidArray.length();i++){
+					for(int j = 0;j < bRidArray.length();j++){
+						if(aRidArray.get(i) == bRidArray.get(j)){
+							jsonArray.put(a);
+							jsonArray.put(b);
+							pass = true;
+							break;
+						}
+					}
+					if(pass){
+						break;
+					}
+				}
+			} catch (JSONException e) {
+				// TODO Auto-generated catch block
+				System.out.println(e.getMessage());
+			}
 		}else if(aIsID && !bIsID){    //B case:[Id,AA.AuId]
-			
+			JSONObject ajson = httpService("Id="+a);
+			System.out.println("a:"+ajson.toString());
+			JSONArray aAAArray = new JSONArray();
+			try {
+				aAAArray = ajson.getJSONArray("entities").getJSONObject(0).getJSONArray("AA");
+				for(int i = 0;i < aAAArray.length();i++){
+					if(aAAArray.getJSONObject(i).getInt("AuId") == b){
+						jsonArray.put(a);
+						jsonArray.put(b);
+						break;
+					}
+				}
+			} catch (JSONException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 		}else if(!aIsID && bIsID){    //C case:[AA.AuId,Id]
-			
+			JSONObject bjson = httpService("Id="+b);
+			System.out.println("b:"+bjson.toString());
+			JSONArray bAAArray = new JSONArray();
+			try {
+				bAAArray = bjson.getJSONArray("entities").getJSONObject(0).getJSONArray("AA");
+				for(int i = 0;i < bAAArray.length();i++){
+					if(bAAArray.getJSONObject(i).getInt("AuId") == a){
+						jsonArray.put(a);
+						jsonArray.put(b);
+						break;
+					}
+				}
+			} catch (JSONException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 		}else{                        //D case:[AA.AuId,AA.AuId]
 			//no paths
 		}
@@ -152,7 +211,7 @@ public class PathFinder {
 			
 			String expr = "Composite(AA.AuId="+id+")";
 	        JSONObject responseJson = httpService(expr);
-	        System.out.println(responseJson.toString());
+//	        System.out.println(responseJson.toString());
 	        if(responseJson.getJSONArray("entities").length() == 0){
 	        	this.aIsID = true;
 	        }
