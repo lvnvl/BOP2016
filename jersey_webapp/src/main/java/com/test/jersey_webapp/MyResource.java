@@ -20,7 +20,9 @@ import org.codehaus.jettison.json.JSONArray;
 import org.codehaus.jettison.json.JSONException;
 import org.codehaus.jettison.json.JSONObject;
 
+import com.sun.javafx.image.impl.IntArgb;
 import com.test.pojo.User;
+import com.test.utils.PathFinder;
 
 /** Example resource class hosted at the URI path "/myresource"
  */
@@ -74,14 +76,18 @@ public class MyResource {
     @Produces(MediaType.APPLICATION_JSON)
     public JSONArray getArrayPairs(@QueryParam("query") JSONArray query) throws JSONException {
 //    	System.out.println("array is:\n"+query.toString());
-    	for(int i = 0;i < query.length();i++){
-    		JSONArray temp = query.getJSONArray(i);
-    		System.out.println("pair["+i+"]:"+temp.getInt(0)+" "+temp.getInt(1));
-    	}
-    	query.put(56);
+//    	for(int i = 0;i < query.length();i++){
+//    		JSONArray temp = query.getJSONArray(i);
+//    		System.out.println("pair["+i+"]:"+temp.getInt(0)+" "+temp.getInt(1));
+//    	}
+//    	query.put(56);
 //    	Collection collection = new Collection();
-    	System.out.println("array is:\n"+query.toString());
-    	return query;
+    	//only a pair will be sent
+    	int a = query.getInt(0);
+    	int b = query.getInt(1);
+//    	System.out.println("sum is:\n"+(a+b));
+    	PathFinder pathFinder = new PathFinder(a,b);
+    	return pathFinder.getPaths();
     }
     
     @GET
