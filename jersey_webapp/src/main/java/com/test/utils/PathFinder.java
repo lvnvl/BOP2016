@@ -1,17 +1,15 @@
 package com.test.utils;
 
-import java.io.IOException;
 import java.net.URI;
 
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
-import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.utils.URIBuilder;
+import org.apache.http.impl.client.HttpClients;
 import org.apache.http.util.EntityUtils;
 import org.codehaus.jettison.json.JSONArray;
-import org.codehaus.jettison.json.JSONException;
 import org.codehaus.jettison.json.JSONObject;
 
 public class PathFinder {
@@ -22,7 +20,6 @@ public class PathFinder {
 	public Boolean bIsID = false ;
 	public long startTime ;
 
-	public HttpClientUtils httpClientUtils;
 	
 	public PathFinder(int a, int b) {
 		// TODO Auto-generated constructor stub
@@ -31,7 +28,6 @@ public class PathFinder {
 		this.setaIsID(a);
 		this.setbIsID(b);
 		this.setStartTime();
-		this.httpClientUtils = new HttpClientUtils();
 	}
 
 	public JSONArray getPaths() {
@@ -40,36 +36,79 @@ public class PathFinder {
 		JSONArray twoHopArray = get2HopPaths();
 		JSONArray triHopArray = get3HopPaths();
 		JSONArray resultArray = new JSONArray();
-		resultArray.put(oneHopArray);
-		resultArray.put(twoHopArray);
-		resultArray.put(triHopArray);
+		if(null != oneHopArray){
+			resultArray.put(oneHopArray);
+		}
+		if(null != twoHopArray){
+			resultArray.put(twoHopArray);
+		}
+		if(null != triHopArray){
+			resultArray.put(triHopArray);
+		}
 		return resultArray;
 	}
 
 	private JSONArray get3HopPaths() {
 		// TODO Auto-generated method stub
-		return null;
+		JSONArray jsonArray = new JSONArray();
+		if(aIsID && bIsID){           //A case:[Id,Id]
+			
+		}else if(aIsID && !bIsID){    //B case:[Id,AA.AuId]
+			
+		}else if(!aIsID && bIsID){    //C case:[AA.AuId,Id]
+			
+		}else{                        //D case:[AA.AuId,AA.AuId]
+			
+		}
+		return jsonArray;
 	}
 
 	private JSONArray get2HopPaths() {
 		// TODO Auto-generated method stub
-		return null;
+		JSONArray jsonArray = new JSONArray();
+		if(aIsID && bIsID){           //A case:[Id,Id]
+			
+		}else if(aIsID && !bIsID){    //B case:[Id,AA.AuId]
+			
+		}else if(!aIsID && bIsID){    //C case:[AA.AuId,Id]
+			
+		}else{                        //D case:[AA.AuId,AA.AuId]
+			
+		}
+		return jsonArray;
 	}
 
 	private JSONArray get1HopPaths() {
 		// TODO Auto-generated method stub
-		return null;
+		JSONArray jsonArray = new JSONArray();
+		if(aIsID && bIsID){           //A case:[Id,Id]
+			
+		}else if(aIsID && !bIsID){    //B case:[Id,AA.AuId]
+			
+		}else if(!aIsID && bIsID){    //C case:[AA.AuId,Id]
+			
+		}else{                        //D case:[AA.AuId,AA.AuId]
+			//no paths
+		}
+		return jsonArray;
 	}
 
-	public JSONObject httpService(URI uri) throws JSONException, ClientProtocolException, IOException{
-		HttpClient httpclient = this.httpClientUtils.newClient();
-		HttpGet request = new HttpGet(uri);
-        HttpResponse response = httpclient.execute(request);
-        HttpEntity entity = response.getEntity();
-        String strEntity  = "[]";
-        strEntity = EntityUtils.toString(entity);
-        JSONObject jsonobject = new JSONObject(strEntity);
-		return jsonobject;
+	public JSONObject httpService(URI uri) {
+		try{
+			HttpClient httpclient = HttpClients.createDefault();
+			
+			HttpGet request = new HttpGet(uri);
+	        HttpResponse response = httpclient.execute(request);
+	        HttpEntity entity = response.getEntity();
+	        String strEntity  = "[]";
+	        strEntity = EntityUtils.toString(entity);
+	        
+	        JSONObject jsonobject = new JSONObject(strEntity);
+			return jsonobject;
+		}catch(Exception e){
+			System.out.println("http Exception:"+e.getMessage());
+		}
+		return null;
 	}
 	
 	public int getA() {
@@ -103,13 +142,16 @@ public class PathFinder {
 	        builder.setParameter("subscription-key", Constant.subscribeKey);
 	        URI uri = builder.build();
 
+//	        System.out.println("uri is: "+uri.toASCIIString());
+	        
 	        JSONObject responseJson = httpService(uri);
+//	        System.out.println(responseJson.toString());
 	        if(responseJson.getJSONArray("entities").length() == 0){
 	        	this.aIsID = true;
 	        }
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
-			System.out.println(e.getMessage());
+			System.out.println("Exception:"+e.getMessage());
 		}
 	}
 

@@ -20,7 +20,6 @@ import org.codehaus.jettison.json.JSONArray;
 import org.codehaus.jettison.json.JSONException;
 import org.codehaus.jettison.json.JSONObject;
 
-import com.sun.javafx.image.impl.IntArgb;
 import com.test.pojo.User;
 import com.test.utils.PathFinder;
 
