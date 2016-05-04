@@ -71,20 +71,9 @@ public class MyResource {
 
     @GET
     @Path("/getPaths")
-    @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    public JSONArray getArrayPairs(@QueryParam("query") JSONArray query) throws JSONException {
-//    	System.out.println("array is:\n"+query.toString());
-//    	for(int i = 0;i < query.length();i++){
-//    		JSONArray temp = query.getJSONArray(i);
-//    		System.out.println("pair["+i+"]:"+temp.getInt(0)+" "+temp.getInt(1));
-//    	}
-//    	query.put(56);
-//    	Collection collection = new Collection();
-    	//only a pair will be sent
-    	int a = query.getInt(0);
-    	int b = query.getInt(1);
-//    	System.out.println("sum is:\n"+(a+b));
+    public JSONArray getArrayPairs(@QueryParam("id1") int a , @QueryParam("id2") int b) throws JSONException {
+    	System.out.println("sum is:\n"+(a+b));
     	PathFinder pathFinder = new PathFinder(a,b);
     	return pathFinder.getPaths();
     }
