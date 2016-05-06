@@ -85,9 +85,15 @@ public class MyResource {
     @Produces(MediaType.APPLICATION_XML)
     public User getUserXml() {
      User user  = new User();
-     user.setName("snail");
-     user.setAge("22");
-     user.setSex("male");
+     try {
+
+         user.setName("snail");
+         user.setAge("22");
+         user.setSex("male");
+	} catch (Exception e) {
+		// TODO: handle exception
+	}
+     user.setAge("88");
      return user;
     }
     
