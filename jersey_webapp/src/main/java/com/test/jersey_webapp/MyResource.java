@@ -19,6 +19,7 @@ import org.apache.http.impl.client.HttpClients;
 import org.codehaus.jettison.json.JSONArray;
 import org.codehaus.jettison.json.JSONException;
 import org.codehaus.jettison.json.JSONObject;
+import org.slf4j.LoggerFactory;
 
 import com.test.pojo.User;
 import com.test.utils.PathFinder;
@@ -73,6 +74,8 @@ public class MyResource {
     @Produces(MediaType.APPLICATION_JSON)
     public JSONArray getArrayPairs(@QueryParam("id1") int a , @QueryParam("id2") int b) throws JSONException {
     	System.out.println("sum is:\n"+(a+b));
+    	LoggerFactory.getLogger(this.getClass()).info("logger info output!-----------\n"
+    			+"[id1,id2]:["+a+","+b+"]");
     	PathFinder pathFinder = new PathFinder(a,b);
     	return pathFinder.getPaths();
     }
