@@ -27,50 +27,49 @@ import com.test.utils.PathFinder;
  */
 @Path("/")
 public class MyResource {
-    
-    /** Method processing HTTP GET requests, producing "text/plain" MIME media
-     * type.
-     * @return String that will be send back as a response of type "text/plain".
-     */
-    @GET 
-    @Produces(MediaType.TEXT_PLAIN)
-    public String getIt() {
-    	HttpClient httpclient = HttpClients.createDefault();
-
-        try
-        {
-            URIBuilder builder = new URIBuilder("https://oxfordhk.azure-api.net/academic/v1.0/evaluate");
-
-            builder.setParameter("expr", "Composite(AA.AuN=='jaime teevan')");
-            builder.setParameter("model", "latest");
-            builder.setParameter("count", "10000");
-            builder.setParameter("attributes", "Id,AA.AuId,AA.AfId,Ti,Y,RId");
-            builder.setParameter("subscription-key", "f7cc29509a8443c5b3a5e56b0e38b5a6");
-
-            URI uri = builder.build();
-            
-            System.out.println("uri is:"+uri.toString());
-            HttpGet request = new HttpGet(uri);
-            
-
-            HttpResponse response = httpclient.execute(request);
-            HttpEntity entity = response.getEntity();
-
-            if (entity != null) 
-            {
-//                System.out.println("response is:\n"+EntityUtils.toString(entity));
-            }
-        }
-        catch (Exception e)
-        {
-            System.out.println(e.getMessage());
-        }
-        return "Hi there!";
-    }
-    
+//    
+//    /** Method processing HTTP GET requests, producing "text/plain" MIME media
+//     * type.
+//     * @return String that will be send back as a response of type "text/plain".
+//     */
+//    @GET 
+//    @Produces(MediaType.TEXT_PLAIN)
+//    public String getIt() {
+//    	HttpClient httpclient = HttpClients.createDefault();
+//
+//        try
+//        {
+//            URIBuilder builder = new URIBuilder("https://oxfordhk.azure-api.net/academic/v1.0/evaluate");
+//
+//            builder.setParameter("expr", "Composite(AA.AuN=='jaime teevan')");
+//            builder.setParameter("model", "latest");
+//            builder.setParameter("count", "10000");
+//            builder.setParameter("attributes", "Id,AA.AuId,AA.AfId,Ti,Y,RId");
+//            builder.setParameter("subscription-key", "f7cc29509a8443c5b3a5e56b0e38b5a6");
+//
+//            URI uri = builder.build();
+//            
+//            System.out.println("uri is:"+uri.toString());
+//            HttpGet request = new HttpGet(uri);
+//            
+//
+//            HttpResponse response = httpclient.execute(request);
+//            HttpEntity entity = response.getEntity();
+//
+//            if (entity != null) 
+//            {
+////                System.out.println("response is:\n"+EntityUtils.toString(entity));
+//            }
+//        }
+//        catch (Exception e)
+//        {
+//            System.out.println(e.getMessage());
+//        }
+//        return "Hi there!";
+//    }
+//    
 
     @GET
-    @Path("/getPaths")
     @Produces(MediaType.APPLICATION_JSON)
     public JSONArray getArrayPairs(@QueryParam("id1") int a , @QueryParam("id2") int b) throws JSONException {
     	System.out.println("sum is:\n"+(a+b));
