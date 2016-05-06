@@ -72,7 +72,7 @@ public class MyResource {
 
     @GET
     @Produces(MediaType.APPLICATION_JSON)
-    public JSONArray getArrayPairs(@QueryParam("id1") int a , @QueryParam("id2") int b) throws JSONException {
+    public JSONArray getArrayPairs(@QueryParam("id1") long a , @QueryParam("id2") long b) throws JSONException {
     	System.out.println("sum is:\n"+(a+b));
     	LoggerFactory.getLogger(this.getClass()).info("logger info output!-----------\n"
     			+"[id1,id2]:["+a+","+b+"]");
