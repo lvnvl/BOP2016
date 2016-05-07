@@ -11,25 +11,22 @@ import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.utils.URIBuilder;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.util.EntityUtils;
-import org.apache.jasper.tagplugins.jstl.core.If;
 import org.codehaus.jettison.json.JSONArray;
 import org.codehaus.jettison.json.JSONException;
 import org.codehaus.jettison.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.sun.enterprise.config.serverbeans.HttpService;
-
 
 public class PathFinder {
 	
-	public long a ;
-	public long b ;
-	public Boolean aIsID = false ;
-	public Boolean bIsID = false ;
-	public long startTime ;
+	public static long a ;
+	public static long b ;
+	public static Boolean aIsID = false ;
+	public static Boolean bIsID = false ;
+	public static  long startTime ;
 	
-	private Logger logger ;
+	private static Logger logger ;
 
 	
 	public PathFinder(long a, long b) {
@@ -60,7 +57,7 @@ public class PathFinder {
 				resultArray.put(twoHopArray.getJSONArray(i));
 			} catch (JSONException e) {
 				// TODO Auto-generated catch block
-				logger.info("add twoHopArray error,exception:"+e.getMessage());
+				//logger.info("add twoHopArray error,exception:"+e.getMessage());
 			}	
 		}
 		for(i = 0;i < triHopArray.length();i++){
@@ -68,7 +65,7 @@ public class PathFinder {
 				resultArray.put(triHopArray.getJSONArray(i));
 			} catch (JSONException e) {
 				// TODO Auto-generated catch block
-				logger.info("add twoHopArray error,exception:"+e.getMessage());
+				//logger.info("add twoHopArray error,exception:"+e.getMessage());
 			}	
 		}
 //		System.out.println("cost :"+(System.currentTimeMillis()-startTime)+"ms");
@@ -76,286 +73,419 @@ public class PathFinder {
 	}
 
 	private JSONArray get3HopPaths() {
-		logger.info("start with 3-hops paths /////////////////////////");
+		//logger.info("start with 3-hops paths /////////////////////////");
 		// TODO Auto-generated method stub
 		JSONArray jsonArray = new JSONArray();
 		int i = 0;
 		int j = 0;
 		int k = 0;
 		if(aIsID && bIsID){           //A case:[Id,Id]
+			//[start] A case
 			JSONObject ajson = httpService("Id="+a);
 			JSONObject bjson = httpService("Id="+b);
 			/*
-			 * instance (1,1,1)
+			 * instance (1,1,1) (1,2,6) (1,3,7) (1,4,8) (1,5,11)
 			 * todo: find every Id from RIds from aId
 			 *       use get2HopPaths() (A case,instance(1,1)) to cal paths
 			 * */
 			JSONArray aRIdArray = new JSONArray();
+			HashSet<Long> idSet = new HashSet<Long>();
 			try {
 				aRIdArray = ajson.getJSONArray("entities").getJSONObject(0).getJSONArray("RId");
 				for(i = 0;i < aRIdArray.length();i++){
 					JSONArray aEntitiesFromRIdArray = httpService("RId="+aRIdArray.getLong(i)).getJSONArray("entities");
 					for(k = 0;k < aEntitiesFromRIdArray.length();k++){
-						JSONArray temp2Hop = get2HopPaths(aEntitiesFromRIdArray.getJSONObject(k).getLong("Id"),b);
-						for(j = 0;j < temp2Hop.length();j++){
-							JSONArray tpArray = new JSONArray();
-							tpArray.put(a);
-							tpArray.put(temp2Hop.getJSONArray(j).getLong(0));
-							tpArray.put(temp2Hop.getJSONArray(j).getLong(1));
-							tpArray.put(temp2Hop.getJSONArray(j).getLong(2));
-							jsonArray.put(tpArray);
-						}
-					}				
-				}
-			} catch (Exception e) {
-				// TODO: handle exception
-				logger.info("instance (1,1,1) exception:"+e.getMessage());
-			}
-			
-			/*
-			 * instance (1,2,6)
-			 * todo: find every RId from aId
-			 *       find every FId from bId
-			 *       use RId and FId to cal Idt1
-			 * */
-			JSONArray bFArray = new JSONArray();
-			try {
-				bFArray = bjson.getJSONArray("entities").getJSONObject(0).getJSONArray("F");
-				for(i = 0;i < aRIdArray.length();i++){
-					for(j = 0;j < bFArray.length();j++){
-						JSONObject Idsjson = httpService("And(RId="+aRIdArray.getLong(i)+",Composite(F.FId="+bFArray.getLong(j)+"))");
-						for(k = 0;k < Idsjson.getJSONArray("entities").length();k++){
-							JSONArray temp = new JSONArray();
-							temp.put(a);
-							temp.put(Idsjson.getJSONArray("entities").getJSONObject(k).getLong("Id"));
-							temp.put(bFArray.getLong(j));
-							temp.put(b);
-							jsonArray.put(temp);
-						}
+						idSet.add(aEntitiesFromRIdArray.getJSONObject(k).getLong("Id"));
 					}
 				}
-			} catch (Exception e) {
-				// TODO: handle exception
-				logger.info("instance (1,2,6) exception:"+e.getMessage());
-			}
-			
-			/*
-			 * instance (1,3,7)
-			 * todo: find every RId from aId
-			 *       find every CId from bId
-			 *       use RId and CId to cal Idt1
-			 * */
-			JSONObject bCjson = new JSONObject();
-			try {
-				bCjson = bjson.getJSONArray("entities").getJSONObject(0);
-			} catch (JSONException e2) {
-				// TODO Auto-generated catch block
-				logger.info("instance (1,3,7) exception:"+e2.getMessage());
-			}
-			if(bCjson.has("C")){
-				try {
-					bCjson = bCjson.getJSONObject("C");
-					for(i = 0;i < aRIdArray.length();i++){
-						JSONObject Idsjson = httpService("And(RId="+aRIdArray.getLong(i)+",Composite(C.CId="+bCjson.getLong("CId")+"))");
-						for(k = 0;k < Idsjson.getJSONArray("entities").length();k++){
-							JSONArray temp = new JSONArray();
-							temp.put(a);
-							temp.put(Idsjson.getJSONArray("entities").getJSONObject(k).getLong("Id"));
-							temp.put(bCjson.getLong("CId"));
-							temp.put(b);
-							jsonArray.put(temp);
-						}
-					}
-				} catch (Exception e) {
-					// TODO: handle exception
-					logger.info("instance (1,3,7) exception:"+e.getMessage());
-				}
-			}
-			
-			/*
-			 * instance (1,4,8)
-			 * todo: find every RId from aId
-			 *       find every JId from bId
-			 *       use RId and JId to cal Idt1
-			 * */
-			JSONObject bjsObject = new JSONObject();
-			try {
-				bjsObject = bjson.getJSONArray("entities").getJSONObject(0);
-			} catch (JSONException e1) {
-				// TODO Auto-generated catch block
-				logger.info("instance (1,4,8) exception:"+e1.getMessage());
-			} 
-			if(bjsObject.has("J")){
-				try {
-					bjsObject = bjsObject.getJSONObject("J");
-					for(i = 0;i < aRIdArray.length();i++){
-						JSONObject Idsjson = httpService("And(RId="+aRIdArray.getLong(i)+",Composite(J.JId="+bjsObject.getLong("JId")+"))");
-						for(k = 0;k < Idsjson.getJSONArray("entities").length();k++){
-							JSONArray temp = new JSONArray();
-							temp.put(a);
-							temp.put(Idsjson.getJSONArray("entities").getJSONObject(k).getLong("Id"));
-							temp.put(bjsObject.getLong("JId"));
-							temp.put(b);
-							jsonArray.put(temp);
-						}	
-					}
-				} catch (Exception e) {
-					// TODO: handle exception
-					logger.info("instance (1,3,7) exception:"+e.getMessage());
-				}
-			}
+				logger.info("instance (1,1,1)--(1,5,11) find all a's related Ids consumed:"+(System.currentTimeMillis()-startTime)+"ms");
+				Get2HopRunnable runnable = new Get2HopRunnable(idSet,a, b, true);
 				
-			/*
-			 * instance (1,5,11)
-			 * todo: find every RId from aId
-			 *       find every AuId from bId
-			 *       use RId and AuId to cal Idt1
-			 * */
-			JSONArray bAAArray = new JSONArray();
-			try {
-				bAAArray = bjson.getJSONArray("entities").getJSONObject(0).getJSONArray("AA");
-				for(i = 0;i < aRIdArray.length();i++){
-					for(j = 0;j < bAAArray.length();j++){
-						JSONObject Idsjson = httpService("And(RId="+aRIdArray.getLong(i)+",Composite(AA.AuId="+bAAArray.getJSONObject(j).getLong("AuId")+"))");
-						for(k = 0;k < Idsjson.getJSONArray("entities").length();k++){
-							JSONArray temp = new JSONArray();
-							temp.put(a);
-							temp.put(Idsjson.getJSONArray("entities").getJSONObject(k).getLong("Id"));
-							temp.put(bAAArray.getJSONObject(j).getLong("AuId"));
-							temp.put(b);
-							jsonArray.put(temp);
-						}
-					}
-				}
+				//[start] use ten threads to run
+				Thread t0 = new Thread(runnable);
+				Thread t1 = new Thread(runnable);
+				Thread t2 = new Thread(runnable);
+				Thread t3 = new Thread(runnable);
+				Thread t4 = new Thread(runnable);
+				Thread t5 = new Thread(runnable);
+				Thread t6 = new Thread(runnable);
+				Thread t7 = new Thread(runnable);
+				Thread t8 = new Thread(runnable);
+				Thread t9 = new Thread(runnable);
+				t0.start();
+				t1.start();
+				t2.start();
+				t3.start();
+				t4.start();
+				t5.start();
+				t6.start();
+				t7.start();
+				t8.start();
+				t9.start();
+				t0.join();
+				t1.join();
+				t2.join();
+				t3.join();
+				t4.join();
+				t5.join();
+				t6.join();
+				t7.join();
+				t8.join();
+				t9.join();
+				//[end]
+				jsonArray = runnable.jsonArray;
+//				
+//				Iterator<Long> iterator = idSet.iterator();
+//				while(iterator.hasNext()){
+//					//logger.info("instance (1,1,1)--(1,5,11) time consumed:"+(System.currentTimeMillis()-startTime)+"ms(for for "+k+")");
+//					
+//					JSONArray temp2Hop = get2HopPaths(iterator.next(),b);
+//					for(j = 0;j < temp2Hop.length();j++){
+//						JSONArray tpArray = new JSONArray();
+//						tpArray.put(a);
+//						tpArray.put(temp2Hop.getJSONArray(j).getLong(0));
+//						tpArray.put(temp2Hop.getJSONArray(j).getLong(1));
+//						tpArray.put(temp2Hop.getJSONArray(j).getLong(2));
+//						jsonArray.put(tpArray);
+//					}
+//					if((System.currentTimeMillis()-startTime) > 280000){
+//						logger.info("instance (1,1,1)--(1,5,11) runtime exccess,stop running!time consumed:"+(System.currentTimeMillis()-startTime)+"ms");
+//						try {
+//							this.finalize();
+//						} catch (Throwable e) {
+//							// TODO Auto-generated catch block
+//							e.printStackTrace();
+//						}
+//					}
+//				}
 			} catch (Exception e) {
 				// TODO: handle exception
-				logger.info("instance (1,5,11) exception:"+e.getMessage());
+				logger.info("instance (1,1,1)--(1,5,11) exception:"+e.getMessage());
 			}
+			//logger.info("instance (1,1,1)--(1,5,11) done!");
+			if((System.currentTimeMillis()-startTime) > 280000){
+				//logger.info("instance (1,1,1)--(1,5,11) runtime exccess,stop running!time consumed:"+(System.currentTimeMillis()-startTime)+"ms");
+				return jsonArray;
+			}	
 			
 			/*
-			 * instance (2,6,1)
-			 * todo: find every RId from bId
-			 *       find every FId from aId
-			 *       use RId and FId to cal Idt2
+			 * instance (1,1,1) (2,6,1) (3,7,1) (4,8,1) (5,11,1)
+			 * todo: find every Id from RIds from aId
+			 *       use get2HopPaths() (A case,instance(1,1)) to cal paths
 			 * */
 			JSONArray bRIdArray = new JSONArray();
-			JSONArray aFArray = new JSONArray();
+			idSet.clear();
 			try {
-				bRIdArray = ajson.getJSONArray("entities").getJSONObject(0).getJSONArray("RId");
-				aFArray = ajson.getJSONArray("entities").getJSONObject(0).getJSONArray("F");
+				bRIdArray = bjson.getJSONArray("entities").getJSONObject(0).getJSONArray("RId");
 				for(i = 0;i < bRIdArray.length();i++){
-					for(j = 0;j < aFArray.length();j++){
-						JSONObject Idsjson = httpService("And(RId="+bRIdArray.getLong(i)+",Composite(F.FId="+aFArray.getJSONObject(j).getLong("FId")+"))");
-						for(k = 0;k < Idsjson.getJSONArray("entities").length();k++){
-							JSONArray temp = new JSONArray();
-							temp.put(a);
-							temp.put(aFArray.getJSONObject(j).getLong("FId"));
-							temp.put(Idsjson.getJSONArray("entities").getJSONObject(k).getLong("Id"));
-							temp.put(b);
-							jsonArray.put(temp);
-						}
+					JSONArray aEntitiesFromRIdArray = httpService("RId="+bRIdArray.getLong(i)).getJSONArray("entities");
+					for(k = 0;k < aEntitiesFromRIdArray.length();k++){
+						idSet.add(aEntitiesFromRIdArray.getJSONObject(k).getLong("Id"));
+					}
+				}
+				logger.info("instance (1,1,1)--(5,11,1) find all a's related Ids consumed:"+(System.currentTimeMillis()-startTime)+"ms");
+				Iterator<Long> iterator = idSet.iterator();
+				while(iterator.hasNext()){
+					//logger.info("instance (1,1,1)--(1,5,11) time consumed:"+(System.currentTimeMillis()-startTime)+"ms(for for "+k+")");
+					JSONArray temp2Hop = get2HopPaths(a,iterator.next());
+					for(j = 0;j < temp2Hop.length();j++){
+						JSONArray tpArray = new JSONArray();
+						tpArray.put(temp2Hop.getJSONArray(j).getLong(0));
+						tpArray.put(temp2Hop.getJSONArray(j).getLong(1));
+						tpArray.put(temp2Hop.getJSONArray(j).getLong(2));
+						tpArray.put(b);
+						jsonArray.put(tpArray);
+					}
+					if((System.currentTimeMillis()-startTime) > 280000){
+						logger.info("instance (1,1,1)--(5,11,1) runtime exccess,stop running!time consumed:"+(System.currentTimeMillis()-startTime)+"ms");
+						return jsonArray;
 					}
 				}
 			} catch (Exception e) {
 				// TODO: handle exception
-				logger.info("instance (2,6,1) exception:"+e.getMessage());
+				//logger.info("instance (1,1,1)--(5,11,1) exception:"+e.getMessage());
 			}
+			//logger.info("instance (1,1,1)--(5,11,1) done!");
+
+			//[end] A case
 			
-			/*
-			 * instance (3,7,1)
-			 * todo: find every RId from bId
-			 *       find CId from aId
-			 *       use RId and CId to cal Idt2
-			 * */
-			JSONObject aCjson = new JSONObject();
-			try {
-				aCjson = ajson.getJSONArray("entities").getJSONObject(0);
-			} catch (JSONException e2) {
-				// TODO Auto-generated catch block
-				logger.info("instance (3,7,1) exception:"+e2.getMessage());
-			}
-			if(aCjson.has("C")){
-				try {
-					aCjson = aCjson.getJSONObject("C");
-					for(i = 0;i < bRIdArray.length();i++){
-						JSONObject Idsjson = httpService("And(RId="+bRIdArray.getLong(i)+",Composite(C.CId="+aCjson.getLong("CId")+"))");
-						for(k = 0;k < Idsjson.getJSONArray("entities").length();k++){
-							JSONArray temp = new JSONArray();
-							temp.put(a);
-							temp.put(aCjson.getLong("CId"));
-							temp.put(Idsjson.getJSONArray("entities").getJSONObject(k).getLong("Id"));
-							temp.put(b);
-							jsonArray.put(temp);
-						}
-					}
-				} catch (Exception e) {
-					// TODO: handle exception
-					logger.info("instance (1,3,7) exception:"+e.getMessage());
-				}
-				
-			}
-			
-			/*
-			 * instance (4,8,1)
-			 * todo: find every RId from bId
-			 *       find JId from aId
-			 *       use RId and JId to cal Idt2
-			 * */
-			JSONObject ajsObject = new JSONObject();
-			try {
-				ajsObject = ajson.getJSONArray("entities").getJSONObject(0);
-			} catch (JSONException e1) {
-				// TODO Auto-generated catch block
-				logger.info("instance (4,8,1) exception:"+e1.getMessage());
-			} 
-			if(ajsObject.has("J")){
-				try {
-					ajsObject = ajsObject.getJSONObject("J");
-					for(i = 0;i < bRIdArray.length();i++){
-						JSONObject Idsjson = httpService("And(RId="+bRIdArray.getLong(i)+",Composite(J.JId="+ajsObject.getLong("JId")+"))");
-						for(k = 0;k < Idsjson.getJSONArray("entities").length();k++){
-							JSONArray temp = new JSONArray();
-							temp.put(a);
-							temp.put(ajsObject.getLong("JId"));
-							temp.put(Idsjson.getJSONArray("entities").getJSONObject(k).getLong("Id"));
-							temp.put(b);
-							jsonArray.put(temp);
-						}
-					}
-				} catch (Exception e) {
-					// TODO: handle exception
-					logger.info("instance (4,8,1) exception:"+e.getMessage());
-				}
-			}
-			
-			/*
-			 * instance (5,11,1)
-			 * todo: find every RId from bId
-			 *       find every AuId from aId
-			 *       use RId and AuId to cal Idt2
-			 * */
-			JSONArray aAAArray = new JSONArray();
-			try {
-				aAAArray = ajson.getJSONArray("entities").getJSONObject(0).getJSONArray("AA");
-				for(i = 0;i < bRIdArray.length();i++){
-					for(j = 0;j < aAAArray.length();j++){
-						JSONObject Idsjson = httpService("And(RId="+bRIdArray.getLong(i)+",Composite(AA.AuId="+aAAArray.getJSONObject(j).getLong("AuId")+"))");
-						for(k = 0;k < Idsjson.getJSONArray("entities").length();k++){
-							JSONArray temp = new JSONArray();
-							temp.put(a);
-							temp.put(aAAArray.getJSONObject(j).getLong("AuId"));
-							temp.put(Idsjson.getJSONArray("entities").getJSONObject(k).getLong("Id"));
-							temp.put(b);
-							jsonArray.put(temp);
-						}
-					}
-				}
-			} catch (Exception e) {
-				// TODO: handle exception
-				logger.info("instance (5,11,1) exception:"+e.getMessage());
-			}
-			
+//			/*
+//			 * instance (1,2,6)
+//			 * todo: find every RId from aId
+//			 *       find every FId from bId
+//			 *       use RId and FId to cal Idt1
+//			 * */
+//			JSONArray bFArray = new JSONArray();
+//			try {
+//				bFArray = bjson.getJSONArray("entities").getJSONObject(0).getJSONArray("F");
+//				for(i = 0;i < aRIdArray.length();i++){
+//					for(j = 0;j < bFArray.length();j++){
+//						JSONObject Idsjson = httpService("And(RId="+aRIdArray.getLong(i)+",Composite(F.FId="+bFArray.getLong(j)+"))");
+//						for(k = 0;k < Idsjson.getJSONArray("entities").length();k++){
+//							JSONArray temp = new JSONArray();
+//							temp.put(a);
+//							temp.put(Idsjson.getJSONArray("entities").getJSONObject(k).getLong("Id"));
+//							temp.put(bFArray.getLong(j));
+//							temp.put(b);
+//							jsonArray.put(temp);
+//						}
+//					}
+//				}
+//			} catch (Exception e) {
+//				// TODO: handle exception
+//				//logger.info("instance (1,2,6) exception:"+e.getMessage());
+//			}
+//			//logger.info("instance (1,2,6) done!");
+//			if((System.currentTimeMillis()-startTime) > 280000){
+//				//logger.info("instance (1,2,6) runtime exccess,stop running!time consumed:"+(System.currentTimeMillis()-startTime)+"ms");
+//				return jsonArray;
+//			}
+//			/*
+//			 * instance (1,3,7)
+//			 * todo: find every RId from aId
+//			 *       find every CId from bId
+//			 *       use RId and CId to cal Idt1
+//			 * */
+//			JSONObject bCjson = new JSONObject();
+//			try {
+//				bCjson = bjson.getJSONArray("entities").getJSONObject(0);
+//			} catch (JSONException e2) {
+//				// TODO Auto-generated catch block
+//				//logger.info("instance (1,3,7) exception:"+e2.getMessage());
+//			}
+//			if(bCjson.has("C")){
+//				try {
+//					bCjson = bCjson.getJSONObject("C");
+//					for(i = 0;i < aRIdArray.length();i++){
+//						JSONObject Idsjson = httpService("And(RId="+aRIdArray.getLong(i)+",Composite(C.CId="+bCjson.getLong("CId")+"))");
+//						for(k = 0;k < Idsjson.getJSONArray("entities").length();k++){
+//							JSONArray temp = new JSONArray();
+//							temp.put(a);
+//							temp.put(Idsjson.getJSONArray("entities").getJSONObject(k).getLong("Id"));
+//							temp.put(bCjson.getLong("CId"));
+//							temp.put(b);
+//							jsonArray.put(temp);
+//						}
+//					}
+//				} catch (Exception e) {
+//					// TODO: handle exception
+//					//logger.info("instance (1,3,7) exception:"+e.getMessage());
+//				}
+//			}
+//			//logger.info("instance (1,3,7) done!");
+//			if((System.currentTimeMillis()-startTime) > 280000){
+//				//logger.info("instance (1,3,7) runtime exccess,stop running!time consumed:"+(System.currentTimeMillis()-startTime)+"ms");
+//				return jsonArray;
+//			}
+//			/*
+//			 * instance (1,4,8)
+//			 * todo: find every RId from aId
+//			 *       find every JId from bId
+//			 *       use RId and JId to cal Idt1
+//			 * */
+//			JSONObject bjsObject = new JSONObject();
+//			try {
+//				bjsObject = bjson.getJSONArray("entities").getJSONObject(0);
+//			} catch (JSONException e1) {
+//				// TODO Auto-generated catch block
+//				//logger.info("instance (1,4,8) exception:"+e1.getMessage());
+//			} 
+//			if(bjsObject.has("J")){
+//				try {
+//					bjsObject = bjsObject.getJSONObject("J");
+//					for(i = 0;i < aRIdArray.length();i++){
+//						JSONObject Idsjson = httpService("And(RId="+aRIdArray.getLong(i)+",Composite(J.JId="+bjsObject.getLong("JId")+"))");
+//						for(k = 0;k < Idsjson.getJSONArray("entities").length();k++){
+//							JSONArray temp = new JSONArray();
+//							temp.put(a);
+//							temp.put(Idsjson.getJSONArray("entities").getJSONObject(k).getLong("Id"));
+//							temp.put(bjsObject.getLong("JId"));
+//							temp.put(b);
+//							jsonArray.put(temp);
+//						}	
+//					}
+//				} catch (Exception e) {
+//					// TODO: handle exception
+//					//logger.info("instance (1,4,8) exception:"+e.getMessage());
+//				}
+//			}
+//			//logger.info("instance (1,4,8) done!");
+//			if((System.currentTimeMillis()-startTime) > 280000){
+//				//logger.info("instance (1,4,8) runtime exccess,stop running!time consumed:"+(System.currentTimeMillis()-startTime)+"ms");
+//				return jsonArray;
+//			}
+//			/*
+//			 * instance (1,5,11)
+//			 * todo: find every RId from aId
+//			 *       find every AuId from bId
+//			 *       use RId and AuId to cal Idt1
+//			 * */
+//			JSONArray bAAArray = new JSONArray();
+//			try {
+//				bAAArray = bjson.getJSONArray("entities").getJSONObject(0).getJSONArray("AA");
+//				for(i = 0;i < aRIdArray.length();i++){
+//					for(j = 0;j < bAAArray.length();j++){
+//						JSONObject Idsjson = httpService("And(RId="+aRIdArray.getLong(i)+",Composite(AA.AuId="+bAAArray.getJSONObject(j).getLong("AuId")+"))");
+//						for(k = 0;k < Idsjson.getJSONArray("entities").length();k++){
+//							JSONArray temp = new JSONArray();
+//							temp.put(a);
+//							temp.put(Idsjson.getJSONArray("entities").getJSONObject(k).getLong("Id"));
+//							temp.put(bAAArray.getJSONObject(j).getLong("AuId"));
+//							temp.put(b);
+//							jsonArray.put(temp);
+//						}
+//					}
+//				}
+//			} catch (Exception e) {
+//				// TODO: handle exception
+//				//logger.info("instance (1,5,11) exception:"+e.getMessage());
+//			}
+//			//logger.info("instance (1,5,11) done!");
+//			if((System.currentTimeMillis()-startTime) > 280000){
+//				//logger.info("instance (1,5,11) runtime exccess,stop running!time consumed:"+(System.currentTimeMillis()-startTime)+"ms");
+//				return jsonArray;
+//			}
+//			/*
+//			 * instance (2,6,1)
+//			 * todo: find every RId from bId
+//			 *       find every FId from aId
+//			 *       use RId and FId to cal Idt2
+//			 * */
+//			JSONArray bRIdArray = new JSONArray();
+//			JSONArray aFArray = new JSONArray();
+//			try {
+//				bRIdArray = ajson.getJSONArray("entities").getJSONObject(0).getJSONArray("RId");
+//				aFArray = ajson.getJSONArray("entities").getJSONObject(0).getJSONArray("F");
+//				for(i = 0;i < bRIdArray.length();i++){
+//					for(j = 0;j < aFArray.length();j++){
+//						JSONObject Idsjson = httpService("And(RId="+bRIdArray.getLong(i)+",Composite(F.FId="+aFArray.getJSONObject(j).getLong("FId")+"))");
+//						for(k = 0;k < Idsjson.getJSONArray("entities").length();k++){
+//							JSONArray temp = new JSONArray();
+//							temp.put(a);
+//							temp.put(aFArray.getJSONObject(j).getLong("FId"));
+//							temp.put(Idsjson.getJSONArray("entities").getJSONObject(k).getLong("Id"));
+//							temp.put(b);
+//							jsonArray.put(temp);
+//						}
+//					}
+//				}
+//			} catch (Exception e) {
+//				// TODO: handle exception
+//				//logger.info("instance (2,6,1) exception:"+e.getMessage());
+//			}
+//			//logger.info("instance (2,6,1) done!");
+//			if((System.currentTimeMillis()-startTime) > 280000){
+//				//logger.info("instance (2,6,1) runtime exccess,stop running!time consumed:"+(System.currentTimeMillis()-startTime)+"ms");
+//				return jsonArray;
+//			}
+//			/*
+//			 * instance (3,7,1)
+//			 * todo: find every RId from bId
+//			 *       find CId from aId
+//			 *       use RId and CId to cal Idt2
+//			 * */
+//			JSONObject aCjson = new JSONObject();
+//			try {
+//				aCjson = ajson.getJSONArray("entities").getJSONObject(0);
+//			} catch (JSONException e2) {
+//				// TODO Auto-generated catch block
+//				//logger.info("instance (3,7,1) exception:"+e2.getMessage());
+//			}
+//			if(aCjson.has("C")){
+//				try {
+//					aCjson = aCjson.getJSONObject("C");
+//					for(i = 0;i < bRIdArray.length();i++){
+//						JSONObject Idsjson = httpService("And(RId="+bRIdArray.getLong(i)+",Composite(C.CId="+aCjson.getLong("CId")+"))");
+//						for(k = 0;k < Idsjson.getJSONArray("entities").length();k++){
+//							JSONArray temp = new JSONArray();
+//							temp.put(a);
+//							temp.put(aCjson.getLong("CId"));
+//							temp.put(Idsjson.getJSONArray("entities").getJSONObject(k).getLong("Id"));
+//							temp.put(b);
+//							jsonArray.put(temp);
+//						}
+//					}
+//				} catch (Exception e) {
+//					// TODO: handle exception
+//					//logger.info("instance (3,7,1) exception:"+e.getMessage());
+//				}
+//				
+//			}
+//			//logger.info("instance (3,7,1) done!");
+//			if((System.currentTimeMillis()-startTime) > 280000){
+//				//logger.info("instance (3,7,1) runtime exccess,stop running!time consumed:"+(System.currentTimeMillis()-startTime)+"ms");
+//				return jsonArray;
+//			}
+//			/*
+//			 * instance (4,8,1)
+//			 * todo: find every RId from bId
+//			 *       find JId from aId
+//			 *       use RId and JId to cal Idt2
+//			 * */
+//			JSONObject ajsObject = new JSONObject();
+//			try {
+//				ajsObject = ajson.getJSONArray("entities").getJSONObject(0);
+//			} catch (JSONException e1) {
+//				// TODO Auto-generated catch block
+//				//logger.info("instance (4,8,1) exception:"+e1.getMessage());
+//			} 
+//			if(ajsObject.has("J")){
+//				try {
+//					ajsObject = ajsObject.getJSONObject("J");
+//					for(i = 0;i < bRIdArray.length();i++){
+//						JSONObject Idsjson = httpService("And(RId="+bRIdArray.getLong(i)+",Composite(J.JId="+ajsObject.getLong("JId")+"))");
+//						for(k = 0;k < Idsjson.getJSONArray("entities").length();k++){
+//							JSONArray temp = new JSONArray();
+//							temp.put(a);
+//							temp.put(ajsObject.getLong("JId"));
+//							temp.put(Idsjson.getJSONArray("entities").getJSONObject(k).getLong("Id"));
+//							temp.put(b);
+//							jsonArray.put(temp);
+//						}
+//					}
+//				} catch (Exception e) {
+//					// TODO: handle exception
+//					//logger.info("instance (4,8,1) exception:"+e.getMessage());
+//				}
+//			}
+//			//logger.info("instance (4,8,1) done!");
+//			if((System.currentTimeMillis()-startTime) > 280000){
+//				//logger.info("instance (4,8,1) runtime exccess,stop running!time consumed:"+(System.currentTimeMillis()-startTime)+"ms");
+//				return jsonArray;
+//			}
+//			/*
+//			 * instance (5,11,1)
+//			 * todo: find every RId from bId
+//			 *       find every AuId from aId
+//			 *       use RId and AuId to cal Idt2
+//			 * */
+//			JSONArray aAAArray = new JSONArray();
+//			try {
+//				aAAArray = ajson.getJSONArray("entities").getJSONObject(0).getJSONArray("AA");
+//				for(i = 0;i < bRIdArray.length();i++){
+//					for(j = 0;j < aAAArray.length();j++){
+//						JSONObject Idsjson = httpService("And(RId="+bRIdArray.getLong(i)+",Composite(AA.AuId="+aAAArray.getJSONObject(j).getLong("AuId")+"))");
+//						for(k = 0;k < Idsjson.getJSONArray("entities").length();k++){
+//							JSONArray temp = new JSONArray();
+//							temp.put(a);
+//							temp.put(aAAArray.getJSONObject(j).getLong("AuId"));
+//							temp.put(Idsjson.getJSONArray("entities").getJSONObject(k).getLong("Id"));
+//							temp.put(b);
+//							jsonArray.put(temp);
+//						}
+//					}
+//				}
+//			} catch (Exception e) {
+//				// TODO: handle exception
+//				//logger.info("instance (5,11,1) exception:"+e.getMessage());
+//			}
+//			//logger.info("instance (5,11,1) done!");
+//			if((System.currentTimeMillis()-startTime) > 280000){
+//				//logger.info("instance (5,11,1) runtime exccess,stop running!time consumed:"+(System.currentTimeMillis()-startTime)+"ms");
+//				return jsonArray;
+//			}
 		}else if(aIsID && !bIsID){    //B case:[Id,AA.AuId]
+			//[start] B case
 			JSONObject ajson = httpService("Id="+a);
 			JSONObject bjson = httpService("Composite(AA.AuId="+b+")");
 			/*
@@ -383,9 +513,13 @@ public class PathFinder {
 				}
 			} catch (Exception e) {
 				// TODO: handle exception
-				logger.info("instance (11,1,5) exception:"+e.getMessage());
+				//logger.info("instance (11,1,5) exception:"+e.getMessage());
 			}
-			
+			//logger.info("instance (11,1,5) done!");
+			if((System.currentTimeMillis()-startTime) > 280000){
+				//logger.info("instance (11,1,5) runtime exccess,stop running!time consumed:"+(System.currentTimeMillis()-startTime)+"ms");
+				return jsonArray;
+			}
 			/*
 			 * instance (2,6,5)
 			 * todo: find every FId from Id a
@@ -407,9 +541,13 @@ public class PathFinder {
 				}
 			} catch (Exception e) {
 				// TODO: handle exception
-				logger.info("instance (2,6,5) exception:"+e.getMessage());
+				//logger.info("instance (2,6,5) exception:"+e.getMessage());
 			}
-			
+			//logger.info("instance (2,6,5) done!");
+			if((System.currentTimeMillis()-startTime) > 280000){
+				//logger.info("instance (2,6,5) runtime exccess,stop running!time consumed:"+(System.currentTimeMillis()-startTime)+"ms");
+				return jsonArray;
+			}
 			/*
 			 * instance (3,7,5)
 			 * todo: find CId from aId
@@ -420,7 +558,7 @@ public class PathFinder {
 				aCjson = ajson.getJSONArray("entities").getJSONObject(0);
 			} catch (JSONException e2) {
 				// TODO Auto-generated catch block
-				logger.info("instance (3,7,5) exception:"+e2.getMessage());
+				//logger.info("instance (3,7,5) exception:"+e2.getMessage());
 			}
 			if(aCjson.has("C")){
 				try {
@@ -436,11 +574,15 @@ public class PathFinder {
 					}
 				} catch (Exception e) {
 					// TODO: handle exception
-					logger.info("instance (1,3,7) exception:"+e.getMessage());
+					//logger.info("instance (3,7,5) exception:"+e.getMessage());
 				}
 				
 			}
-			
+			//logger.info("instance (3,7,5) done!");
+			if((System.currentTimeMillis()-startTime) > 280000){
+				//logger.info("instance (3,7,5) runtime exccess,stop running!time consumed:"+(System.currentTimeMillis()-startTime)+"ms");
+				return jsonArray;
+			}
 			/*
 			 * instance (4,8,5)
 			 * todo: find JId from Id a
@@ -451,7 +593,7 @@ public class PathFinder {
 				ajsObject = ajson.getJSONArray("entities").getJSONObject(0);
 			} catch (JSONException e1) {
 				// TODO Auto-generated catch block
-				logger.info("instance (4,8,5) exception:"+e1.getMessage());
+				//logger.info("instance (4,8,5) exception:"+e1.getMessage());
 			} 
 			if(ajsObject.has("J")){
 				try {
@@ -467,10 +609,14 @@ public class PathFinder {
 					}
 				} catch (Exception e) {
 					// TODO: handle exception
-					logger.info("instance (4,8,1) exception:"+e.getMessage());
+					//logger.info("instance (4,8,5) exception:"+e.getMessage());
 				}
 			}
-			
+			//logger.info("instance (4,8,5) done!");
+			if((System.currentTimeMillis()-startTime) > 280000){
+				//logger.info("instance (4,8,5) runtime exccess,stop running!time consumed:"+(System.currentTimeMillis()-startTime)+"ms");
+				return jsonArray;
+			}
 			/*
 			 * instance (5,11,5)
 			 * todo: find every AuId from every Id from AuId b
@@ -500,9 +646,13 @@ public class PathFinder {
 				}
 			} catch (Exception e) {
 				// TODO: handle exception
-				logger.info("instance (5,11,5) exception:"+e.getMessage());
+				//logger.info("instance (5,11,5) exception:"+e.getMessage());
 			}
-			
+			//logger.info("instance (5,11,5) done!");
+			if((System.currentTimeMillis()-startTime) > 280000){
+				//logger.info("instance (5,11,5) runtime exccess,stop running!time consumed:"+(System.currentTimeMillis()-startTime)+"ms");
+				return jsonArray;
+			}
 			/*
 			 * instance (5,9,10)
 			 * todo: find every AuId from Id a
@@ -523,11 +673,19 @@ public class PathFinder {
 				}
 			} catch (Exception e) {
 				// TODO: handle exception
-				logger.info("instance (5,9,10) exception:"+e.getMessage());
+				//logger.info("instance (5,9,10) exception:"+e.getMessage());
 			}
-			
+			//logger.info("instance (5,9,10) done!");
+			if((System.currentTimeMillis()-startTime) > 280000){
+				//logger.info("instance (5,9,10) runtime exccess,stop running!time consumed:"+(System.currentTimeMillis()-startTime)+"ms");
+				return jsonArray;
+			}
+			//[end]
 		}else if(!aIsID && bIsID){    //C case:[AA.AuId,Id]
-			JSONObject ajson = httpService("Composite(AA.AuId = "+a+")");
+			
+			//[start] C case
+			
+//			JSONObject ajson = httpService("Composite(AA.AuId = "+a+")");
 			JSONObject bjson = httpService("Id="+b);
 			
 			/*
@@ -551,9 +709,13 @@ public class PathFinder {
 				}
 			} catch (Exception e) {
 				// TODO: handle exception
-				logger.info("instance (9,10,11) exception:"+e.getMessage());
+				//logger.info("instance (9,10,11) exception:"+e.getMessage());
 			}
-			
+			//logger.info("instance (9,10,11) done!");
+			if((System.currentTimeMillis()-startTime) > 280000){
+				//logger.info("instance (9,10,11) runtime exccess,stop running!time consumed:"+(System.currentTimeMillis()-startTime)+"ms");
+				return jsonArray;
+			}
 			/*
 			 * instance (11,1,1)
 			 * todo: find every Id from RId from Id b
@@ -579,33 +741,44 @@ public class PathFinder {
 				}
 			} catch (Exception e) {
 				// TODO: handle exception
-				logger.info("instance (11,1,1) exception:"+e.getMessage());
+				//logger.info("instance (11,1,1) exception:"+e.getMessage());
 			}
-			
+			//logger.info("instance (11,1,1) done!");
+			if((System.currentTimeMillis()-startTime) > 280000){
+				//logger.info("instance (11,1,1) runtime exccess,stop running!time consumed:"+(System.currentTimeMillis()-startTime)+"ms");
+				return jsonArray;
+			}
 			/*
 			 * instance (11,2,6)
 			 * todo: find FId from Id b
 			 *       use AuId a and FId to cal Idt1
 			 * */
-			JSONArray bFArray = new JSONArray();
+			JSONObject bFObject = new JSONObject();
 			try {
-				bFArray = bjson.getJSONArray("entities").getJSONObject(0).getJSONArray("F");
-				for(j = 0;j < bFArray.length();j++){
-					JSONObject Idsjson = httpService("Composite(And(AA.AuId="+a+",F.FId="+bFArray.getJSONObject(j).getLong("FId")+"))");
-					for(k = 0;k < Idsjson.getJSONArray("entities").length();k++){
-						JSONArray temp = new JSONArray();
-						temp.put(a);
-						temp.put(Idsjson.getJSONArray("entities").getJSONObject(k).getLong("Id"));
-						temp.put(bFArray.getJSONObject(j).getLong("FId"));
-						temp.put(b);
-						jsonArray.put(temp);
+				bFObject = bjson.getJSONArray("entities").getJSONObject(0);
+				if(bFObject.has("F")){
+					JSONArray bFArray = bFObject.getJSONArray("F");;
+					for(j = 0;j < bFArray.length();j++){
+						JSONObject Idsjson = httpService("Composite(And(AA.AuId="+a+",F.FId="+bFArray.getJSONObject(j).getLong("FId")+"))");
+						for(k = 0;k < Idsjson.getJSONArray("entities").length();k++){
+							JSONArray temp = new JSONArray();
+							temp.put(a);
+							temp.put(Idsjson.getJSONArray("entities").getJSONObject(k).getLong("Id"));
+							temp.put(bFArray.getJSONObject(j).getLong("FId"));
+							temp.put(b);
+							jsonArray.put(temp);
+						}
 					}
 				}
 			} catch (Exception e) {
 				// TODO: handle exception
-				logger.info("instance (11,2,6) exception:"+e.getMessage());
+				//logger.info("instance (11,2,6) exception:"+e.getMessage());
 			}
-
+			//logger.info("instance (11,2,6) done!");
+			if((System.currentTimeMillis()-startTime) > 280000){
+				//logger.info("instance (11,2,6) runtime exccess,stop running!time consumed:"+(System.currentTimeMillis()-startTime)+"ms");
+				return jsonArray;
+			}
 			/*
 			 * instance (11,3,7)
 			 * todo: find CId from Id b
@@ -616,7 +789,7 @@ public class PathFinder {
 				bCjson = bjson.getJSONArray("entities").getJSONObject(0);
 			} catch (JSONException e2) {
 				// TODO Auto-generated catch block
-				logger.info("instance (11,3,7) exception:"+e2.getMessage());
+				//logger.info("instance (11,3,7) exception:"+e2.getMessage());
 			}
 			if(bCjson.has("C")){
 				try {
@@ -632,11 +805,15 @@ public class PathFinder {
 					}
 				} catch (Exception e) {
 					// TODO: handle exception
-					logger.info("instance (11,3,7) exception:"+e.getMessage());
+					//logger.info("instance (11,3,7) exception:"+e.getMessage());
 				}
 				
 			}
-			
+			//logger.info("instance (11,3,7) done!");
+			if((System.currentTimeMillis()-startTime) > 280000){
+				//logger.info("instance (11,3,7) runtime exccess,stop running!time consumed:"+(System.currentTimeMillis()-startTime)+"ms");
+				return jsonArray;
+			}
 			/*
 			 * instance (11,4,8)
 			 * todo: find JId from Id b
@@ -647,7 +824,7 @@ public class PathFinder {
 				bjsObject = bjson.getJSONArray("entities").getJSONObject(0);
 			} catch (JSONException e1) {
 				// TODO Auto-generated catch block
-				logger.info("instance (11,4,8) exception:"+e1.getMessage());
+				//logger.info("instance (11,4,8) exception:"+e1.getMessage());
 			} 
 			if(bjsObject.has("J")){
 				try {
@@ -663,10 +840,14 @@ public class PathFinder {
 					}
 				} catch (Exception e) {
 					// TODO: handle exception
-					logger.info("instance (11,4,8) exception:"+e.getMessage());
+					//logger.info("instance (11,4,8) exception:"+e.getMessage());
 				}
 			}
-			
+			//logger.info("instance (11,4,8) done!");
+			if((System.currentTimeMillis()-startTime) > 280000){
+				//logger.info("instance (11,4,8) runtime exccess,stop running!time consumed:"+(System.currentTimeMillis()-startTime)+"ms");
+				return jsonArray;
+			}
 			/*
 			 * instance (11,5,11)
 			 * todo: find every AuId from Id b
@@ -688,9 +869,14 @@ public class PathFinder {
 				}
 			} catch (Exception e) {
 				// TODO: handle exception
-				logger.info("instance (5,11,5) exception:"+e.getMessage());
+				//logger.info("instance (5,11,5) exception:"+e.getMessage());
 			}
+			//logger.info("instance (11,5,11) done!");
+			//[end]
 		}else{                        //D case:[AA.AuId,AA.AuId]
+			
+			//[start] D case
+			
 			JSONObject ajson = httpService("Composite(AA.AuId="+a+")");
 			/*
 			 * instance (11,1,5)
@@ -713,18 +899,20 @@ public class PathFinder {
 				}
 			} catch (Exception e) {
 				// TODO: handle exception
-				logger.info("instance (11,1,5) exception:"+e.getMessage());
+				//logger.info("instance (11,1,5) exception:"+e.getMessage());
 			}
+			//logger.info("instance (11,1,5) done!");
+			//[end]
 		}
-		logger.info("end with 3-hops paths /////////////////////////");
+		//logger.info("end with 3-hops paths /////////////////////////");
 		return jsonArray;
 	}
 
-	private JSONArray get2HopPaths(long a,long b) {
-		logger.info("start with 2-hops paths...................");
+	public static JSONArray get2HopPaths(long a,long b) {
 		// TODO Auto-generated method stub
 		JSONArray jsonArray = new JSONArray();
 		if(aIsID && bIsID){           //A case:[Id,Id]
+			//[start] A case
 			JSONObject ajson = httpService("Id="+a);
 			JSONObject bjson = httpService("Id="+b);      
 			/*
@@ -763,34 +951,46 @@ public class PathFinder {
 				}
 			} catch (Exception e) {
 				// TODO: handle exception
-				logger.info("instance (1,1) exception:"+e.getMessage());
+				//logger.info("instance (1,1) exception:"+e.getMessage());
 			}
-			
+			if((System.currentTimeMillis()-startTime) > 280000){
+				//logger.info("2-hop instance (1,1) runtime exccess,stop running!");
+				return jsonArray;
+			}
 			/*
 			 * instance (2,6)
 			 * todo: find FIds both in ajson and bjson
 			 * */
 			JSONArray aFIdArray = new JSONArray();
 			JSONArray bFIdArray = new JSONArray();
+			JSONObject aFIdObject = new JSONObject();
+			JSONObject bFIdObject = new JSONObject();
 			try {
-				aFIdArray = ajson.getJSONArray("entities").getJSONObject(0).getJSONArray("F");
-				bFIdArray = bjson.getJSONArray("entities").getJSONObject(0).getJSONArray("F");
-				for(int i = 0;i < aFIdArray.length();i++){
-					for(int j = 0;j < bFIdArray.length();j++){
-						if(aFIdArray.getJSONObject(i).getLong("FId") == bFIdArray.getJSONObject(j).getLong("FId")){
-							JSONArray temp = new JSONArray();
-							temp.put(a);
-							temp.put(aFIdArray.getJSONObject(i).getLong("FId"));
-							temp.put(b);
-							jsonArray.put(temp);
+				aFIdObject = ajson.getJSONArray("entities").getJSONObject(0);
+				bFIdObject = bjson.getJSONArray("entities").getJSONObject(0);
+				if(aFIdObject.has("F") && bFIdObject.has("F")){
+					aFIdArray = aFIdObject.getJSONArray("F");
+					bFIdArray = bFIdObject.getJSONArray("F");
+					for(int i = 0;i < aFIdArray.length();i++){
+						for(int j = 0;j < bFIdArray.length();j++){
+							if(aFIdArray.getJSONObject(i).getLong("FId") == bFIdArray.getJSONObject(j).getLong("FId")){
+								JSONArray temp = new JSONArray();
+								temp.put(a);
+								temp.put(aFIdArray.getJSONObject(i).getLong("FId"));
+								temp.put(b);
+								jsonArray.put(temp);
+							}
 						}
 					}
 				}
 			} catch (Exception e) {
 				// TODO: handle exception
-				logger.info("instance (2,6) exception:"+e.getMessage());
+				//logger.info("2-hop instance (2,6) exception:"+e.getMessage());
 			}
-			
+			if((System.currentTimeMillis()-startTime) > 280000){
+				//logger.info("2-hop instance (2,6) runtime exccess,stop running!");
+				return jsonArray;
+			}
 			/*
 			 * instance (3,7)
 			 * todo: find CId is equal within ajson and bjson
@@ -802,7 +1002,7 @@ public class PathFinder {
 				bCjson = bjson.getJSONArray("entities").getJSONObject(0);
 			} catch (JSONException e1) {
 				// TODO Auto-generated catch block
-				logger.info("instance (3,7) exception:" + e1.getMessage());
+				//logger.info("instance (3,7) exception:" + e1.getMessage());
 			}
 			if(aCjson.has("C") && bCjson.has("C")){
 				try {
@@ -815,10 +1015,13 @@ public class PathFinder {
 					}
 				} catch (Exception e) {
 					// TODO: handle exception
-					logger.info("instance (3,7) exception:"+e.getMessage());
+					//logger.info("instance (3,7) exception:"+e.getMessage());
 				}
 			}
-			
+			if((System.currentTimeMillis()-startTime) > 280000){
+				//logger.info("2-hop instance (3,7) runtime exccess,stop running!");
+				return jsonArray;
+			}
 			/*
 			 * instance (4,8)
 			 * todo: find JId is equal within ajson and bjson
@@ -830,7 +1033,7 @@ public class PathFinder {
 				bJjson = bjson.getJSONArray("entities").getJSONObject(0);
 			} catch (JSONException e1) {
 				// TODO Auto-generated catch block
-				logger.info("instance (4,8) exception:" + e1.getMessage());
+				//logger.info("instance (4,8) exception:" + e1.getMessage());
 			}
 			if(aJjson.has("J") && bJjson.has("J")){
 				try {
@@ -843,10 +1046,13 @@ public class PathFinder {
 					}
 				} catch (Exception e) {
 					// TODO: handle exception
-					logger.info("instance (4,8) exception:"+e.getMessage());
+					//logger.info("instance (4,8) exception:"+e.getMessage());
 				}
 			}
-			
+			if((System.currentTimeMillis()-startTime) > 280000){
+				//logger.info("2-hop instance (4,8) runtime exccess,stop running!");
+				return jsonArray;
+			}
 			/*
 			 * instance (5,11)
 			 * todo: find AuIds both in ajson and bjson
@@ -869,10 +1075,11 @@ public class PathFinder {
 				}
 			} catch (Exception e) {
 				// TODO: handle exception
-				logger.info("instance (5,11) exception:"+e.getMessage());
+				//logger.info("instance (5,11) exception:"+e.getMessage());
 			}
-			
+			//[end]
 		}else if(aIsID && !bIsID){    //B case:[Id,AA.AuId]
+			//[start] B case
 			JSONObject ajson = httpService("Id="+a);  
 			/*
 			 * instance (1,5)
@@ -902,10 +1109,11 @@ public class PathFinder {
 				}
 			} catch (Exception e) {
 				// TODO: handle exception
-				logger.info("instance (1,1) exception:"+e.getMessage());
+				//logger.info("instance (1,1) exception:"+e.getMessage());
 			}
-			
+			//[end]
 		}else if(!aIsID && bIsID){    //C case:[AA.AuId,Id]
+			//[start] C case
 			JSONObject ajson = httpService("Composite(AA.AuId = "+a+")");
 			JSONObject bjson = httpService("Id="+b);
 			/*
@@ -938,9 +1146,11 @@ public class PathFinder {
 				}
 			} catch (Exception e) {
 				// TODO: handle exception
-				logger.info("instance (1) exception:"+e.getMessage());
+				//logger.info("instance (11,1) exception:"+e.getMessage());
 			}
+			//[end]
 		}else{                        //D case:[AA.AuId,AA.AuId]
+			//[start] D case
 			JSONObject ajson = httpService("Composite(AA.AuId = "+a+")");
 			JSONObject bjson = httpService("Composite(AA.AuId = "+b+")");
 			/*
@@ -991,9 +1201,12 @@ public class PathFinder {
 				}
 			} catch (Exception e) {
 				// TODO: handle exception
-				logger.info("instance (9,10) exception:"+e.getMessage());
+				//logger.info("instance (9,10) exception:"+e.getMessage());
 			}
-			
+			if((System.currentTimeMillis()-startTime) > 280000){
+				//logger.info("2-hop runtime exccess,stop running!");
+				return jsonArray;
+			}
 			/*
 			 * instance (11,5)
 			 * todo: find all paper both has a and b
@@ -1011,19 +1224,19 @@ public class PathFinder {
 				}
 			} catch (JSONException e) {
 				// TODO Auto-generated catch block
-				logger.info("instance (11,5) exception:"+e.getMessage());
+				//logger.info("instance (11,5) exception:"+e.getMessage());
 			}
-			
+			//[end]
 		}
-		logger.info("end with 2-hops paths.......................");
 		return jsonArray;
 	}
 
 	private JSONArray get1HopPaths() {
-		logger.info("start with 1-hop paths +++++++++++++++++++++++++++");
+		//logger.info("start with 1-hop paths +++++++++++++++++++++++++++");
 		// TODO Auto-generated method stub
 		JSONArray jsonArray = new JSONArray();
 		if(aIsID && bIsID){           //A case:[Id,Id]
+			//logger.info("------------A     CASE----------------");
 			/*
 			 * instance (1)
 			 * */
@@ -1051,9 +1264,10 @@ public class PathFinder {
 				}
 			} catch (JSONException e) {
 				// TODO Auto-generated catch block
-				logger.info("instance (1) exception:"+e.getMessage());
+				//logger.info("instance (1) exception:"+e.getMessage());
 			}
 		}else if(aIsID && !bIsID){    //B case:[Id,AA.AuId]
+			//logger.info("------------B     CASE----------------");
 			/*
 			 * instance （5）
 			 * */
@@ -1071,9 +1285,10 @@ public class PathFinder {
 				}
 			} catch (JSONException e) {
 				// TODO Auto-generated catch block
-				logger.info("instance (5) exception:"+e.getMessage());
+				//logger.info("instance (5) exception:"+e.getMessage());
 			}
 		}else if(!aIsID && bIsID){    //C case:[AA.AuId,Id]
+			//logger.info("------------C     CASE----------------");
 			/*
 			 * instance （11）
 			 * */
@@ -1091,12 +1306,13 @@ public class PathFinder {
 				}
 			} catch (JSONException e) {
 				// TODO Auto-generated catch block
-				logger.info("instance (11) exception:"+e.getMessage());
+				//logger.info("instance (11) exception:"+e.getMessage());
 			}
 		}else{                        //D case:[AA.AuId,AA.AuId]
+			//logger.info("------------D     CASE----------------");
 			//no paths
 		}
-		logger.info("end with 1-hop paths+++++++++++++++++++++++++++++++");
+		//logger.info("end with 1-hop paths+++++++++++++++++++++++++++++++");
 		return jsonArray;
 	}
 
@@ -1104,7 +1320,7 @@ public class PathFinder {
 	 * 传入expr的表达式，返回查询结果
 	 * eg: https://oxfordhk.azure-api.net/academic/v1.0/evaluate?expr=Composite(AA.AuN==%27jaime%20teevan%27)&count=10000&attributes=Id,AA.AuId,AA.AfId,F.FId,J.JId,C.CId,RId&subscription-key=f7cc29509a8443c5b3a5e56b0e38b5a6
 	 * */
-	public JSONObject httpService(String exp) {
+	public static JSONObject httpService(String exp) {
 		URIBuilder builder;
 		try{
 			builder = new URIBuilder("https://oxfordhk.azure-api.net/academic/v1.0/evaluate");

@@ -8,14 +8,6 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 
-import java.net.URI;
-
-import org.apache.http.HttpEntity;
-import org.apache.http.HttpResponse;
-import org.apache.http.client.HttpClient;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.client.utils.URIBuilder;
-import org.apache.http.impl.client.HttpClients;
 import org.codehaus.jettison.json.JSONArray;
 import org.codehaus.jettison.json.JSONException;
 import org.codehaus.jettison.json.JSONObject;
@@ -74,10 +66,12 @@ public class MyResource {
     @Produces(MediaType.APPLICATION_JSON)
     public JSONArray getArrayPairs(@QueryParam("id1") long a , @QueryParam("id2") long b) throws JSONException {
     	System.out.println("sum is:\n"+(a+b));
-    	LoggerFactory.getLogger(this.getClass()).info("logger info output!-----------\n"
+    	LoggerFactory.getLogger(this.getClass()).info("\n\nlogger info output!-----------"
     			+"[id1,id2]:["+a+","+b+"]");
     	PathFinder pathFinder = new PathFinder(a,b);
-    	return pathFinder.getPaths();
+    	JSONArray resultArray = pathFinder.getPaths();
+    	LoggerFactory.getLogger(getClass()).info("===================find:\n"+resultArray.toString());
+    	return resultArray;
     }
     
     @GET
