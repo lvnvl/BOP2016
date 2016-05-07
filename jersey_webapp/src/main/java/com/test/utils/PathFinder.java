@@ -1351,7 +1351,7 @@ public class PathFinder {
 	}
 
 	public void setA(long a2) {
-		this.a = a2;
+		PathFinder.a = a2;
 	}
 
 	public long getB() {
@@ -1359,7 +1359,7 @@ public class PathFinder {
 	}
 
 	public void setB(long b2) {
-		this.b = b2;
+		PathFinder.b = b2;
 	}
 
 	public Boolean getaIsID() {
@@ -1381,7 +1381,7 @@ public class PathFinder {
 	        JSONObject responseJson = httpService(expr);
 //	        System.out.println(responseJson.toString());
 	        if(responseJson.getJSONArray("entities").length() == 0){
-	        	this.aIsID = true;
+	        	PathFinder.aIsID = true;
 	        }
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
@@ -1407,7 +1407,7 @@ public class PathFinder {
 	        String expr = "Composite(AA.AuId="+b2+")";
 	        JSONObject responseJson = httpService(expr);
 	        if(responseJson.getJSONArray("entities").length() == 0){
-	        	this.bIsID = true;
+	        	PathFinder.bIsID = true;
 	        }
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
@@ -1420,6 +1420,6 @@ public class PathFinder {
 	}
 
 	public void setStartTime() {
-		this.startTime = System.currentTimeMillis();
+		PathFinder.startTime = System.currentTimeMillis();
 	}
 }
