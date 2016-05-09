@@ -101,10 +101,7 @@ public class PathFinder {
 			try {
 				aRIdArray = ajson.getJSONArray("entities").getJSONObject(0).getJSONArray("RId");
 				for(i = 0;i < aRIdArray.length();i++){
-					JSONArray aEntitiesFromRIdArray = httpService("RId="+aRIdArray.getLong(i)).getJSONArray("entities");
-					for(k = 0;k < aEntitiesFromRIdArray.length();k++){
-						idSet.add(aEntitiesFromRIdArray.getJSONObject(k).getLong("Id"));
-					}
+					idSet.add(aRIdArray.getLong(i));
 				}
 				logger.info("instance (1,1,1)--(1,5,11) find all a's related Ids:"+ idSet.size() +" consumed:"+(System.currentTimeMillis()-startTime)+"ms");
 				Get2HopRunnable runnable = new Get2HopRunnable(idSet,a, b, true,true,this,aIsID,bIsID);
@@ -127,10 +124,6 @@ public class PathFinder {
 			}
 			//System.out.println("instance (1,1,1)--(1,5,11) found:"+ jsonArray==null?"[]":jsonArray.length() + "条");
 			logger.info("instance (1,1,1)--(1,5,11) done!");
-//			if((System.currentTimeMillis()-startTime) > 280000){
-//				//logger.info("instance (1,1,1)--(1,5,11) runtime exccess,stop running!time consumed:"+(System.currentTimeMillis()-startTime)+"ms");
-//				return jsonArray;
-//			}	
 			
 			/*
 			 * instance (2,6,1) (3,7,1) (4,8,1) (5,11,1)
@@ -142,10 +135,7 @@ public class PathFinder {
 			try {
 				bRIdArray = bjson.getJSONArray("entities").getJSONObject(0).getJSONArray("RId");
 				for(i = 0;i < bRIdArray.length();i++){
-					JSONArray aEntitiesFromRIdArray = httpService("RId="+bRIdArray.getLong(i)).getJSONArray("entities");
-					for(k = 0;k < aEntitiesFromRIdArray.length();k++){
-						idSet.add(aEntitiesFromRIdArray.getJSONObject(k).getLong("Id"));
-					}
+					idSet.add(aRIdArray.getLong(i));
 				}
 				logger.info("instance (2,6,1)--(5,11,1) find all a's related Ids :"+ idSet.size() +"  consumed:"+(System.currentTimeMillis()-startTime)+"ms");
 				Get2HopRunnable runnable = new Get2HopRunnable(idSet,a, b, false,false,this,aIsID,bIsID);
@@ -421,30 +411,16 @@ public class PathFinder {
 				aRIdArray = ajson.getJSONArray("entities").getJSONObject(0).getJSONArray("RId");
 				bRIdArray = bjson.getJSONArray("entities").getJSONObject(0).getJSONArray("RId");
 				/*
-				 * find RIds both in ajson and bjson
+				 * find RIds in ajson and check is there exist b
 				 * */
 				if(first){
-					HashSet<Long> idsHS = new HashSet<Long>();
 					for(int i = 0;i < aRIdArray.length();i++){
-						for(int j = 0;j < bRIdArray.length();j++){
-							/*
-							 * process every found RId
-							 * */
-							if(aRIdArray.getLong(i) == bRIdArray.getLong(j)){
-								JSONObject temp = httpService("RId="+aRIdArray.getInt(i));
-								JSONArray idsArray = temp.getJSONArray("entities");
-								for(int k = 0;k < idsArray.length(); k++){
-									idsHS.add(idsArray.getJSONObject(k).getLong("Id"));
-								}
-							}
+						JSONObject ridAndBJson = httpService("And(Id="+ aRIdArray.getLong(i) +",RId="+ b +")");
+						if(ridAndBJson.getJSONArray("entities").length() != 0){
+							JSONArray tempArray = new JSONArray();
+							tempArray.put(a);tempArray.put(aRIdArray.getLong(i));tempArray.put(b);
+							jsonArray.put(tempArray);
 						}
-					}
-					//gen array from hashset
-					Iterator<Long> it = idsHS.iterator();
-					while(it.hasNext()){
-						JSONArray tempArray = new JSONArray();
-						tempArray.put(a);tempArray.put(it.next());tempArray.put(b);
-						jsonArray.put(tempArray);
 					}
 				}
 			} catch (Exception e) {
@@ -596,6 +572,15 @@ public class PathFinder {
 			HashSet<Long> idsHS = new HashSet<Long>();
 			try {
 				aRIdArray = ajson.getJSONArray("entities").getJSONObject(0).getJSONArray("RId");
+				
+				for(int i = 0;i < aRIdArray.length();i++){
+					JSONObject ridAndBJson = httpService("And(Id="+ aRIdArray.getLong(i) +",Composite(AA.AuId="+ b +"))");
+					if(ridAndBJson.getJSONArray("entities").length() != 0){
+						JSONArray tempArray = new JSONArray();
+						tempArray.put(a);tempArray.put(aRIdArray.getLong(i));tempArray.put(b);
+						jsonArray.put(tempArray);
+					}
+				}
 				/*
 				 * find Ids in aRIdArray
 				 * */
@@ -621,48 +606,22 @@ public class PathFinder {
 			//[end]
 		}else if(!aIsID && bIsID){    //C case:[AA.AuId,Id]
 			//[start] C case
-			JSONObject ajson = httpService("Composite(AA.AuId = "+a+")");
-			JSONObject bjson = httpService("Id="+b);
-			try {
-				if(ajson.getJSONArray("entities").length() == 0 || bjson.getJSONArray("entities").length() == 0 ){
-					//System.out.println("now 2-hop C case has empty.ids:["+ a +","+ b +"]");
-					return null;
-				}
-			} catch (Exception e) {
-				// TODO: handle exception
-				logger.info("now 2-hop C case has empty.ids:["+ a +","+ b +"]");
-			}
 			/*
 			 * instance (11,1)
-			 * todo: get RIds from a
-			 *       foreach Id in a get whoes Rids has common with Rids in b
+			 * todo: get RId from b ,get AuId from a, find Ids contain both
 			 * */
-			JSONArray aEntitiesArray = new JSONArray();
-			JSONArray bRIdArray = new JSONArray();
+			JSONObject idsjson = httpService("And(RId="+ b +",Composite(AA.AuId="+ a +"))");
+			JSONArray entitiesArray = new JSONArray();
 			try {
-				aEntitiesArray = ajson.getJSONArray("entities");
-				bRIdArray = bjson.getJSONArray("entities").getJSONObject(0).getJSONArray("RId");
-				for(int i = 0;i < aEntitiesArray.length(); i++){
-					boolean pass = false;
-					JSONArray aRidArray = aEntitiesArray.getJSONObject(i).getJSONArray("RId");
-					for(int k = 0;k < aRidArray.length();k++){
-						for(int j = 0;j < bRIdArray.length();j++){
-							if(aRidArray.getLong(k) == bRIdArray.getLong(j)){
-								JSONArray temp = new JSONArray();
-								temp.put(a);temp.put(aEntitiesArray.getJSONObject(i).getLong("Id"));temp.put(b);
-								jsonArray.put(temp);
-								pass = true;
-								break;
-							}
-						}
-						if(pass){
-							break;
-						}
-					}
+				entitiesArray = idsjson.getJSONArray("entities");
+				for(int i = 0;i < entitiesArray.length();i++){
+					JSONArray tempArray = new JSONArray();
+					tempArray.put(a);tempArray.put(entitiesArray.getJSONObject(i).getLong("Id"));tempArray.put(b);
+					jsonArray.put(tempArray);
 				}
 			} catch (Exception e) {
 				// TODO: handle exception
-				logger.info("instance (11,1) exception:"+e.getMessage());
+				logger.info("now 2-hop C case (11,1) exception:"+e.getMessage());
 			}
 			//[end]
 		}else{                        //D case:[AA.AuId,AA.AuId]
@@ -766,25 +725,17 @@ public class PathFinder {
 			 * instance (1)
 			 * */
 			JSONObject ajson = httpService("Id="+a);
-			JSONObject bjson = httpService("Id="+b);
 //			//System.out.println("a:"+ajson.toString()+"\nb:"+bjson.toString());
 			JSONArray aRidArray = new JSONArray();
-			JSONArray bRidArray = new JSONArray();
 			try {
-				aRidArray = ajson.getJSONArray("entities").getJSONObject(0).getJSONArray("RId");
-				bRidArray = bjson.getJSONArray("entities").getJSONObject(0).getJSONArray("RId");
-				boolean pass = false;
-				for(int i = 0;i < aRidArray.length();i++){
-					for(int j = 0;j < bRidArray.length();j++){
-						if(aRidArray.getLong(i) == bRidArray.getLong(j)){
+				if(ajson.getJSONArray("entities").length() != 0){
+					aRidArray = ajson.getJSONArray("entities").getJSONObject(0).getJSONArray("RId");
+					for(int i = 0;i < aRidArray.length();i++){
+						if(aRidArray.getLong(i) == b){
 							jsonArray.put(a);
 							jsonArray.put(b);
-							pass = true;
 							break;
 						}
-					}
-					if(pass){
-						break;
 					}
 				}
 			} catch (JSONException e) {
