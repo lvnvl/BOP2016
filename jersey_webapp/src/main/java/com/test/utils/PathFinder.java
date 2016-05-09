@@ -47,7 +47,7 @@ public class PathFinder {
 		// TODO Auto-generated method stub
 		JSONArray oneHopArray = get1HopPaths();
 		logger.info("find 1-hop cost :"+(System.currentTimeMillis()-startTime)+"ms");
-		JSONArray twoHopArray = get2HopPaths(a,b,true);
+		JSONArray twoHopArray = get2HopPaths(a,b,true,aIsID,bIsID);
 		logger.info("find 2-hop cost :"+(System.currentTimeMillis()-startTime)+"ms");
 		JSONArray triHopArray = get3HopPaths();
 		logger.info("find 3-hop cost :"+(System.currentTimeMillis()-startTime)+"ms");
@@ -56,23 +56,27 @@ public class PathFinder {
 			resultArray.put(oneHopArray);
 		}
 		int i = 0;
-		for(i = 0;i < twoHopArray.length();i++){
-			try {
-				resultArray.put(twoHopArray.getJSONArray(i));
-			} catch (JSONException e) {
-				// TODO Auto-generated catch block
-				logger.info("add twoHopArray error,exception:"+e.getMessage());
-			}	
+		if(twoHopArray != null && twoHopArray.length() != 0){
+			for(i = 0;i < twoHopArray.length();i++){
+				try {
+					resultArray.put(twoHopArray.getJSONArray(i));
+				} catch (JSONException e) {
+					// TODO Auto-generated catch block
+					logger.info("add twoHopArray error,exception:"+e.getMessage());
+				}	
+			}
 		}
-		for(i = 0;i < triHopArray.length();i++){
-			try {
-				resultArray.put(triHopArray.getJSONArray(i));
-			} catch (JSONException e) {
-				// TODO Auto-generated catch block
-				logger.info("add twoHopArray error,exception:"+e.getMessage());
-			}	
+		if(triHopArray != null && triHopArray.length() != 0){
+			for(i = 0;i < triHopArray.length();i++){
+				try {
+					resultArray.put(triHopArray.getJSONArray(i));
+				} catch (JSONException e) {
+					// TODO Auto-generated catch block
+					logger.info("add twoHopArray error,exception:"+e.getMessage());
+				}	
+			}
 		}
-//		System.out.println("cost :"+(System.currentTimeMillis()-startTime)+"ms");
+//		//System.out.println("cost :"+(System.currentTimeMillis()-startTime)+"ms");
 		return resultArray;
 	}
 
@@ -102,47 +106,27 @@ public class PathFinder {
 						idSet.add(aEntitiesFromRIdArray.getJSONObject(k).getLong("Id"));
 					}
 				}
-				logger.info("instance (1,1,1)--(1,5,11) find all a's related Ids consumed:"+(System.currentTimeMillis()-startTime)+"ms");
-				Get2HopRunnable runnable = new Get2HopRunnable(idSet,a, b, true,true,this);
+				logger.info("instance (1,1,1)--(1,5,11) find all a's related Ids:"+ idSet.size() +" consumed:"+(System.currentTimeMillis()-startTime)+"ms");
+				Get2HopRunnable runnable = new Get2HopRunnable(idSet,a, b, true,true,this,aIsID,bIsID);
 				
-				//[start] use ten threads to run
+				//[start] use three threads to run
 				Thread t0 = new Thread(runnable);
 				Thread t1 = new Thread(runnable);
 				Thread t2 = new Thread(runnable);
-				Thread t3 = new Thread(runnable);
-				Thread t4 = new Thread(runnable);
-				Thread t5 = new Thread(runnable);
-				Thread t6 = new Thread(runnable);
-				Thread t7 = new Thread(runnable);
-				Thread t8 = new Thread(runnable);
-				Thread t9 = new Thread(runnable);
 				t0.start();
 				t1.start();
 				t2.start();
-				t3.start();
-				t4.start();
-				t5.start();
-				t6.start();
-				t7.start();
-				t8.start();
-				t9.start();
 				t0.join();
 				t1.join();
 				t2.join();
-				t3.join();
-				t4.join();
-				t5.join();
-				t6.join();
-				t7.join();
-				t8.join();
-				t9.join();
 				//[end]
 				jsonArray = runnable.jsonArray;
 			} catch (Exception e) {
 				// TODO: handle exception
 				logger.info("instance (1,1,1)--(1,5,11) exception:"+e.getMessage());
 			}
-			//logger.info("instance (1,1,1)--(1,5,11) done!");
+			//System.out.println("instance (1,1,1)--(1,5,11) found:"+ jsonArray==null?"[]":jsonArray.length() + "条");
+			logger.info("instance (1,1,1)--(1,5,11) done!");
 //			if((System.currentTimeMillis()-startTime) > 280000){
 //				//logger.info("instance (1,1,1)--(1,5,11) runtime exccess,stop running!time consumed:"+(System.currentTimeMillis()-startTime)+"ms");
 //				return jsonArray;
@@ -163,49 +147,31 @@ public class PathFinder {
 						idSet.add(aEntitiesFromRIdArray.getJSONObject(k).getLong("Id"));
 					}
 				}
-				logger.info("instance (2,6,1)--(5,11,1) find all a's related Ids consumed:"+(System.currentTimeMillis()-startTime)+"ms");
-				Get2HopRunnable runnable = new Get2HopRunnable(idSet,a, b, false,false,this);
+				logger.info("instance (2,6,1)--(5,11,1) find all a's related Ids :"+ idSet.size() +"  consumed:"+(System.currentTimeMillis()-startTime)+"ms");
+				Get2HopRunnable runnable = new Get2HopRunnable(idSet,a, b, false,false,this,aIsID,bIsID);
 				
-				//[start] use ten threads to run
+				//[start] use three threads to run
 				Thread t0 = new Thread(runnable);
 				Thread t1 = new Thread(runnable);
 				Thread t2 = new Thread(runnable);
-				Thread t3 = new Thread(runnable);
-				Thread t4 = new Thread(runnable);
-				Thread t5 = new Thread(runnable);
-				Thread t6 = new Thread(runnable);
-				Thread t7 = new Thread(runnable);
-				Thread t8 = new Thread(runnable);
-				Thread t9 = new Thread(runnable);
 				t0.start();
 				t1.start();
 				t2.start();
-				t3.start();
-				t4.start();
-				t5.start();
-				t6.start();
-				t7.start();
-				t8.start();
-				t9.start();
 				t0.join();
 				t1.join();
 				t2.join();
-				t3.join();
-				t4.join();
-				t5.join();
-				t6.join();
-				t7.join();
-				t8.join();
-				t9.join();
 				//[end]
 				JSONArray resultArray = runnable.jsonArray;
-				for(i = 0;i < resultArray.length();i ++){
-					jsonArray.put(resultArray.getJSONArray(i));
+				if(resultArray != null && resultArray.length() != 0){
+					for(i = 0;i < resultArray.length();i ++){
+						jsonArray.put(resultArray.getJSONArray(i));
+					}
 				}
 			} catch (Exception e) {
 				// TODO: handle exception
 				logger.info("instance (2,6,1)--(5,11,1) exception:"+e.getMessage());
 			}
+			//System.out.println("instance (2,6,1)--(5,11,1) found:"+ jsonArray==null?"[]":jsonArray.length() + "条");
 			logger.info("instance (2,6,1)--(5,11,1) done!");
 
 			//[end] A case
@@ -227,39 +193,18 @@ public class PathFinder {
 					idSet.add(bEntitiesArray.getJSONObject(i).getLong("Id"));
 				}
 				logger.info("instance (1,1,5)--(5,11,5) find all a's related Ids consumed:"+(System.currentTimeMillis()-startTime)+"ms");
-				Get2HopRunnable runnable = new Get2HopRunnable(idSet,a, b, false,true,this);
+				Get2HopRunnable runnable = new Get2HopRunnable(idSet,a, b, false,true,this,true,true);
 				
-				//[start] use ten threads to run
+				//[start] use three threads to run
 				Thread t0 = new Thread(runnable);
 				Thread t1 = new Thread(runnable);
 				Thread t2 = new Thread(runnable);
-				Thread t3 = new Thread(runnable);
-				Thread t4 = new Thread(runnable);
-				Thread t5 = new Thread(runnable);
-				Thread t6 = new Thread(runnable);
-				Thread t7 = new Thread(runnable);
-				Thread t8 = new Thread(runnable);
-				Thread t9 = new Thread(runnable);
 				t0.start();
 				t1.start();
 				t2.start();
-				t3.start();
-				t4.start();
-				t5.start();
-				t6.start();
-				t7.start();
-				t8.start();
-				t9.start();
 				t0.join();
 				t1.join();
 				t2.join();
-				t3.join();
-				t4.join();
-				t5.join();
-				t6.join();
-				t7.join();
-				t8.join();
-				t9.join();
 				//[end]
 				jsonArray = runnable.jsonArray;
 			} catch (Exception e) {
@@ -271,31 +216,52 @@ public class PathFinder {
 //				logger.info("instance (11,1,5) runtime exccess,stop running!time consumed:"+(System.currentTimeMillis()-startTime)+"ms");
 //				return jsonArray;
 //			}
-			
+			//System.out.println("instance (1,1,5)--(5,11,5) found:"+ jsonArray==null?"[]":jsonArray.toString());
 			/*
 			 * instance (5,9,10)
 			 * todo: find every AuId from Id a
-			 *       use get2HopPaths() (A case,instance(9,10)) to cal paths
+			 *       find AfId of AuId b
+			 *       find out who work with b
 			 * */
 			JSONArray aAAArray = new JSONArray();
+			long bfId = 0;
 			try {
 				aAAArray = ajson.getJSONArray("entities").getJSONObject(0).getJSONArray("AA");
-				for(i = 0;i < aAAArray.length();i++){
-					JSONArray temp2HopArray =  get2HopPaths(aAAArray.getJSONObject(i).getLong("AuId"), b, true);
-					for(k = 0;k < temp2HopArray.length();k++){
-						JSONArray temp = new JSONArray();
-						temp.put(a);
-						temp.put(temp2HopArray.getJSONArray(k).getLong(0));
-						temp.put(temp2HopArray.getJSONArray(k).getLong(1));
-						temp.put(b);
-						jsonArray.put(temp);
+				boolean pass = false;
+				//get b's AfId
+				for(i = 0;i < bEntitiesArray.length();i ++){
+					JSONArray bAAArray = bEntitiesArray.getJSONObject(i).getJSONArray("AA");
+					for(j = 0;j < bAAArray.length();j ++){
+						if(a == bAAArray.getJSONObject(j).getLong("AuId") && bAAArray.getJSONObject(j).has("AfId")){
+							bfId = bAAArray.getJSONObject(j).getLong("AfId");
+							pass = true;
+							break;
+						}
 					}
-						
+					if(pass){
+						break;
+					}
+				}
+				//get a's AuId compare with AfId
+				if(bfId != 0){
+					aAAArray = ajson.getJSONArray("entities").getJSONObject(0).getJSONArray("AA");
+					for(i = 0;i < aAAArray.length();i++){
+						JSONObject cojson = httpService("And(Composite(AA.AuId="+ aAAArray.getJSONObject(i).getLong("AuId") +",AA.AfId="+ bfId +"))");
+						if(cojson.getJSONArray("entities").length() != 0){
+							JSONArray tempArray = new JSONArray();
+							tempArray.put(a);
+							tempArray.put(aAAArray.getJSONObject(i).getLong("AuId"));
+							tempArray.put(bfId);
+							tempArray.put(b);
+							jsonArray.put(tempArray);
+						}
+					}
 				}
 			} catch (Exception e) {
 				// TODO: handle exception
 				logger.info("instance (5,9,10) exception:"+e.getMessage());
 			}
+			//System.out.println("instance (5,9,10) found:"+ jsonArray==null?"[]":jsonArray.toString());
 			logger.info("instance (5,9,10) done! time consumed:"+ (System.currentTimeMillis()-startTime) +"ms");
 			
 			//[end]
@@ -318,40 +284,19 @@ public class PathFinder {
 				for(i = 0;i < aEntitiesArray.length();i++){
 					idSet.add(aEntitiesArray.getJSONObject(i).getLong("Id"));
 				}
-				logger.info("instance (11,1,1)--(11,5,11) find all a's related Ids consumed:"+(System.currentTimeMillis()-startTime)+"ms");
-				Get2HopRunnable runnable = new Get2HopRunnable(idSet, a, b, true,true,this);
+				logger.info("instance (11,1,1)--(11,5,11) find all a's related Ids:"+ idSet.size() +" consumed:"+(System.currentTimeMillis()-startTime)+"ms");
+				Get2HopRunnable runnable = new Get2HopRunnable(idSet, a, b, true,true,this,true,true);
 				
 				//[start] use ten threads to run
 				Thread t0 = new Thread(runnable);
 				Thread t1 = new Thread(runnable);
 				Thread t2 = new Thread(runnable);
-				Thread t3 = new Thread(runnable);
-				Thread t4 = new Thread(runnable);
-				Thread t5 = new Thread(runnable);
-				Thread t6 = new Thread(runnable);
-				Thread t7 = new Thread(runnable);
-				Thread t8 = new Thread(runnable);
-				Thread t9 = new Thread(runnable);
 				t0.start();
 				t1.start();
 				t2.start();
-				t3.start();
-				t4.start();
-				t5.start();
-				t6.start();
-				t7.start();
-				t8.start();
-				t9.start();
 				t0.join();
 				t1.join();
 				t2.join();
-				t3.join();
-				t4.join();
-				t5.join();
-				t6.join();
-				t7.join();
-				t8.join();
-				t9.join();
 				//[end]
 				jsonArray = runnable.jsonArray;
 			} catch (Exception e) {
@@ -363,6 +308,7 @@ public class PathFinder {
 //				logger.info("instance (11,1,1)--(11,5,11) runtime exccess,stop running!time consumed:"+(System.currentTimeMillis()-startTime)+"ms");
 //				return jsonArray;
 //			}
+			//System.out.println("instance (11,1,1)--(11,5,11) found:"+ jsonArray==null?"[]":jsonArray.toString());
 			/*
 			 * instance (9,10,11)
 			 * todo: find every AuId from Id b
@@ -407,6 +353,7 @@ public class PathFinder {
 				// TODO: handle exception
 				logger.info("instance (9,10,11) exception:"+e.getMessage());
 			}
+			//System.out.println("instance (9,10,11) found:"+ jsonArray==null?"[]":jsonArray.toString());
 			logger.info("instance (9,10,11) done! consumed:"+(System.currentTimeMillis()-startTime)+"ms");
 			
 			//[end]
@@ -424,7 +371,7 @@ public class PathFinder {
 			try {
 				aIdArray = ajson.getJSONArray("entities");
 				for(i = 0;i < aIdArray.length();i++){
-					JSONArray temp2Hop = get2HopPaths(aIdArray.getJSONObject(i).getLong("Id"),b,true);
+					JSONArray temp2Hop = get2HopPaths(aIdArray.getJSONObject(i).getLong("Id"),b,true,true,false);
 					for(j = 0;j < temp2Hop.length();j++){
 						JSONArray tpArray = new JSONArray();
 						tpArray.put(a);
@@ -438,6 +385,7 @@ public class PathFinder {
 				// TODO: handle exception
 				logger.info("instance (11,1,5) exception:"+e.getMessage());
 			}
+			//System.out.println("instance (11,1,5) found:"+ jsonArray==null?"[]":jsonArray.toString());
 			logger.info("instance (11,1,5) done! consumed:"+(System.currentTimeMillis()-startTime)+"ms");
 			//[end]
 		}
@@ -445,13 +393,24 @@ public class PathFinder {
 		return jsonArray;
 	}
 
-	public JSONArray get2HopPaths(long a,long b,boolean first) {
+	public JSONArray get2HopPaths(long a,long b,boolean first,boolean aIsID,boolean bIsID) {
 		// TODO Auto-generated method stub
 		JSONArray jsonArray = new JSONArray();
 		if(aIsID && bIsID){           //A case:[Id,Id]
 			//[start] A case
 			JSONObject ajson = httpService("Id="+a);
-			JSONObject bjson = httpService("Id="+b);      
+			JSONObject bjson = httpService("Id="+b);
+			
+			try {
+				if(ajson.getJSONArray("entities").length() == 0 || bjson.getJSONArray("entities").length() == 0 ){
+					//System.out.println("now 2-hop A case has empty.ids:["+ a +","+ b +"]");
+					return null;
+				}
+			} catch (Exception e) {
+				// TODO: handle exception
+				logger.info("now 2-hop A case has empty.ids:["+ a +","+ b +"]");
+			}
+			
 			/*
 			 * instance (1,1)        可选是否执行 first   为真是才执行
 			 * todo: find RIds both in ajson and bjson then from them get different Ids
@@ -619,7 +578,16 @@ public class PathFinder {
 			//[end]
 		}else if(aIsID && !bIsID){    //B case:[Id,AA.AuId]
 			//[start] B case
-			JSONObject ajson = httpService("Id="+a);  
+			JSONObject ajson = httpService("Id="+a);
+			try {
+				if(ajson.getJSONArray("entities").length() == 0 ){
+					//System.out.println("now 2-hop B case has empty.ids:["+ a +","+ b +"]");
+					return null;
+				}
+			} catch (Exception e) {
+				// TODO: handle exception
+				logger.info("now 2-hop B case has empty.ids:["+ a +","+ b +"]");
+			}
 			/*
 			 * instance (1,5)
 			 * todo: find Ids both in (Ids from RIds in ajson) and (Ids from bjson)
@@ -655,6 +623,15 @@ public class PathFinder {
 			//[start] C case
 			JSONObject ajson = httpService("Composite(AA.AuId = "+a+")");
 			JSONObject bjson = httpService("Id="+b);
+			try {
+				if(ajson.getJSONArray("entities").length() == 0 || bjson.getJSONArray("entities").length() == 0 ){
+					//System.out.println("now 2-hop C case has empty.ids:["+ a +","+ b +"]");
+					return null;
+				}
+			} catch (Exception e) {
+				// TODO: handle exception
+				logger.info("now 2-hop C case has empty.ids:["+ a +","+ b +"]");
+			}
 			/*
 			 * instance (11,1)
 			 * todo: get RIds from a
@@ -692,6 +669,15 @@ public class PathFinder {
 			//[start] D case
 			JSONObject ajson = httpService("Composite(AA.AuId = "+a+")");
 			JSONObject bjson = httpService("Composite(AA.AuId = "+b+")");
+			try {
+				if(ajson.getJSONArray("entities").length() == 0 || bjson.getJSONArray("entities").length() == 0 ){
+					//System.out.println("now 2-hop D case has empty.ids:["+ a +","+ b +"]");
+					return null;
+				}
+			} catch (Exception e) {
+				// TODO: handle exception
+				logger.info("now 2-hop D case has empty.ids:["+ a +","+ b +"]");
+			}
 			/*
 			 * instance (9,10)
 			 * todo: check if a and b from the same affiliation
@@ -781,7 +767,7 @@ public class PathFinder {
 			 * */
 			JSONObject ajson = httpService("Id="+a);
 			JSONObject bjson = httpService("Id="+b);
-//			System.out.println("a:"+ajson.toString()+"\nb:"+bjson.toString());
+//			//System.out.println("a:"+ajson.toString()+"\nb:"+bjson.toString());
 			JSONArray aRidArray = new JSONArray();
 			JSONArray bRidArray = new JSONArray();
 			try {
@@ -811,7 +797,7 @@ public class PathFinder {
 			 * instance （5）
 			 * */
 			JSONObject ajson = httpService("Id="+a);
-//			System.out.println("a:"+ajson.toString());
+//			//System.out.println("a:"+ajson.toString());
 			JSONArray aAAArray = new JSONArray();
 			try {
 				aAAArray = ajson.getJSONArray("entities").getJSONObject(0).getJSONArray("AA");
@@ -832,7 +818,7 @@ public class PathFinder {
 			 * instance （11）
 			 * */
 			JSONObject bjson = httpService("Id="+b);
-//			System.out.println("b:"+bjson.toString());
+//			//System.out.println("b:"+bjson.toString());
 			JSONArray bAAArray = new JSONArray();
 			try {
 				bAAArray = bjson.getJSONArray("entities").getJSONObject(0).getJSONArray("AA");
@@ -880,7 +866,7 @@ public class PathFinder {
 	        JSONObject jsonobject = new JSONObject(strEntity);
 			return jsonobject;
 		}catch(Exception e){
-			System.out.println("http Exception:"+e.getMessage());
+			//System.out.println("http Exception:"+e.getMessage());
 		}
 		return null;
 	}
@@ -914,7 +900,7 @@ public class PathFinder {
 	        }
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
-			System.out.println("Exception:"+e.getMessage());
+			//System.out.println("Exception:"+e.getMessage());
 		}
 	}
 
@@ -931,7 +917,7 @@ public class PathFinder {
 	        }
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
-			System.out.println(e.getMessage());
+			//System.out.println(e.getMessage());
 		}
 	}
 
