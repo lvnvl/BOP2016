@@ -127,15 +127,17 @@ public class PathFinder {
 			
 			/*
 			 * instance (2,6,1) (3,7,1) (4,8,1) (5,11,1)
-			 * todo: find every Id from RIds from aId
+			 * todo: find every Id whoes RId equals to b
 			 *       use get2HopPaths() (A case,instance(1,1)) to cal paths
 			 * */
-			JSONArray bRIdArray = new JSONArray();
+			JSONArray bEntititesArray = new JSONArray();
 			idSet.clear();
 			try {
-				bRIdArray = bjson.getJSONArray("entities").getJSONObject(0).getJSONArray("RId");
-				for(i = 0;i < bRIdArray.length();i++){
-					idSet.add(aRIdArray.getLong(i));
+				bEntititesArray = httpService("RId=" + b).getJSONArray("entities");
+				if(bEntititesArray.length() != 0){
+					for(i = 0;i < bEntititesArray.length();i++){
+						idSet.add(bEntititesArray.getJSONObject(i).getLong("Id"));
+					}
 				}
 				logger.info("instance (2,6,1)--(5,11,1) find all a's related Ids :"+ idSet.size() +"  consumed:"+(System.currentTimeMillis()-startTime)+"ms");
 				Get2HopRunnable runnable = new Get2HopRunnable(idSet,a, b, false,false,this,aIsID,bIsID);
