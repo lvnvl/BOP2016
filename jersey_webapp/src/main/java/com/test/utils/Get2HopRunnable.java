@@ -54,7 +54,7 @@ public class Get2HopRunnable implements Runnable{
 				i ++ ;
 				JSONArray temp2Hop = new JSONArray();
 				if(fromA){
-					temp2Hop = pathFinder.get2HopPaths(iterator.next(),b,first,aIsID,bIsID);
+					temp2Hop = pathFinder.get2HopPaths(iterator.next().longValue(),b,first,aIsID,bIsID);
 					if(temp2Hop != null && temp2Hop.length() != 0){
 						for(int j = 0;j < temp2Hop.length();j++){
 							JSONArray tpArray = new JSONArray();
@@ -71,7 +71,7 @@ public class Get2HopRunnable implements Runnable{
 						}
 					}
 				}else{
-					temp2Hop = pathFinder.get2HopPaths(a,iterator.next(),first,aIsID,bIsID);
+					temp2Hop = pathFinder.get2HopPaths(a,iterator.next().longValue(),first,aIsID,bIsID);
 					if(temp2Hop != null && temp2Hop.length() != 0){
 						for(int j = 0;j < temp2Hop.length();j++){
 							JSONArray tpArray = new JSONArray();
