@@ -1,0 +1,94 @@
+[INFO] [2016-05-14 07:21:36][com.test.jersey_webapp.MyResource]******************************************************************
+logger info output!-----------[id1,id2]:[2251253715,2180737804]
+ [INFO] [2016-05-14 07:21:38][com.test.utils.PathFinder]------------C     CASE----------------
+ [INFO] [2016-05-14 07:21:38][com.test.utils.PathFinder]find 1-hop cost :422ms
+ [INFO] [2016-05-14 07:21:38][com.test.utils.PathFinder]find 2-hop cost :797ms
+ [INFO] [2016-05-14 07:21:38][com.test.utils.PathFinder]start with 3-hops paths /////////////////////////
+ [INFO] [2016-05-14 07:21:39][com.test.utils.PathFinder]instance (11,1,1)--(11,5,11) find all a's related Ids:2 consumed:1681ms
+ [INFO] [2016-05-14 07:21:39][com.test.utils.Get2HopRunnable]线程37执行完毕，time consumed :1715ms.  i=0
+ [INFO] [2016-05-14 07:21:40][com.test.utils.Get2HopRunnable]线程35执行完毕，time consumed :2406ms.  i=1
+ [INFO] [2016-05-14 07:21:40][com.test.utils.Get2HopRunnable]线程36执行完毕，time consumed :2444ms.  i=1
+ [INFO] [2016-05-14 07:21:40][com.test.utils.PathFinder]instance (11,1,1)--(11,5,11) done!
+ [INFO] [2016-05-14 07:21:40][com.test.utils.PathFinder]instance (9,10,11) done! consumed:2444ms
+ [INFO] [2016-05-14 07:21:40][com.test.utils.PathFinder]end with 3-hops paths /////////////////////////
+ [INFO] [2016-05-14 07:21:40][com.test.utils.PathFinder]find 3-hop cost :2445ms
+ [INFO] [2016-05-14 07:21:40][com.test.jersey_webapp.MyResource]===================find:
+[[2251253715,2180737804],[2251253715,2180737804,35927321,2180737804],[2251253715,2180737804,2048498903,2180737804],[2251253715,2180737804,2223920688,2180737804],[2251253715,2180737804,949266530,2180737804],[2251253715,2180737804,1783833040,2180737804],[2251253715,2180737804,2251253715,2180737804],[2251253715,2180737804,2108096461,2180737804],[2251253715,2299839756,2048498903,2180737804],[2251253715,2299839756,949266530,2180737804],[2251253715,2299839756,2223920688,2180737804],[2251253715,2299839756,1783833040,2180737804],[2251253715,2299839756,2251253715,2180737804],[2251253715,2299839756,2108096461,2180737804]]
+ [INFO] [2016-05-14 07:21:40][com.test.jersey_webapp.MyResource]******************************************************************
+logger info output!-----------[id1,id2]:[2147152072,189831743]
+ [INFO] [2016-05-14 07:21:41][com.test.utils.PathFinder]------------A     CASE----------------
+ [INFO] [2016-05-14 07:21:41][com.test.utils.PathFinder]find 1-hop cost :729ms
+ [INFO] [2016-05-14 07:21:49][com.test.utils.PathFinder]find 2-hop cost :7917ms
+ [INFO] [2016-05-14 07:21:49][com.test.utils.PathFinder]start with 3-hops paths /////////////////////////
+ [INFO] [2016-05-14 07:21:49][com.test.utils.PathFinder]instance (1,1,1)--(1,5,11) find all a's related Ids:17 consumed:8194ms
+ [INFO] [2016-05-14 07:22:00][com.test.utils.Get2HopRunnable]线程39执行完毕，time consumed :19259ms.  i=8
+ [INFO] [2016-05-14 07:22:01][com.test.utils.Get2HopRunnable]线程41执行完毕，time consumed :20110ms.  i=5
+ [INFO] [2016-05-14 07:22:06][com.test.utils.Get2HopRunnable]线程40执行完毕，time consumed :25028ms.  i=4
+ [INFO] [2016-05-14 07:22:06][com.test.utils.PathFinder]instance (1,1,1)--(1,5,11) done!
+ [INFO] [2016-05-14 07:22:06][com.test.utils.PathFinder]instance (2,6,1)--(5,11,1) find all a's related Ids :10  consumed:25182ms
+ [INFO] [2016-05-14 07:22:08][com.test.utils.Get2HopRunnable]线程43执行完毕，time consumed :27381ms.  i=3
+ [INFO] [2016-05-14 07:22:09][com.test.utils.Get2HopRunnable]线程44执行完毕，time consumed :28149ms.  i=3
+ [INFO] [2016-05-14 07:22:09][com.test.utils.Get2HopRunnable]线程42执行完毕，time consumed :28164ms.  i=4
+ [INFO] [2016-05-14 07:22:09][com.test.utils.PathFinder]instance (2,6,1)--(5,11,1) done!
+ [INFO] [2016-05-14 07:22:09][com.test.utils.PathFinder]end with 3-hops paths /////////////////////////
+ [INFO] [2016-05-14 07:22:09][com.test.utils.PathFinder]find 3-hop cost :28164ms
+ [INFO] [2016-05-14 07:22:09][com.test.jersey_webapp.MyResource]===================find:
+[[2147152072,2151561903,189831743],[2147152072,41008148,189831743],[2147152072,134022301,41008148,189831743],[2147152072,1965061793,41008148,189831743],[2147152072,2114804204,41008148,189831743],[2147152072,2041565863,41008148,189831743],[2147152072,35738896,41008148,189831743],[2147152072,2107827038,41008148,189831743],[2147152072,2151561903,41008148,189831743],[2147152072,186311912,1974415342,189831743],[2147152072,41008148,2086513752,189831743],[2147152072,41008148,2120932642,189831743],[2147152072,41008148,2051032335,189831743],[2147152072,186311912,2151561903,189831743],[2147152072,41008148,2151561903,189831743],[2147152072,135954941,2151561903,189831743],[2147152072,23123220,2109539048,189831743],[2147152072,41008148,2109539048,189831743]]
+ [INFO] [2016-05-14 07:22:09][com.test.jersey_webapp.MyResource]******************************************************************
+logger info output!-----------[id1,id2]:[2332023333,2310280492]
+ [INFO] [2016-05-14 07:22:10][com.test.utils.PathFinder]------------A     CASE----------------
+ [INFO] [2016-05-14 07:22:10][com.test.utils.PathFinder]find 1-hop cost :461ms
+ [INFO] [2016-05-14 07:22:10][com.test.utils.PathFinder]find 2-hop cost :861ms
+ [INFO] [2016-05-14 07:22:10][com.test.utils.PathFinder]start with 3-hops paths /////////////////////////
+ [INFO] [2016-05-14 07:22:11][com.test.utils.PathFinder]instance (1,1,1)--(1,5,11) find all a's related Ids:0 consumed:1238ms
+ [INFO] [2016-05-14 07:22:11][com.test.utils.Get2HopRunnable]线程45执行完毕，time consumed :1239ms.  i=0
+ [INFO] [2016-05-14 07:22:11][com.test.utils.Get2HopRunnable]线程46执行完毕，time consumed :1239ms.  i=0
+ [INFO] [2016-05-14 07:22:11][com.test.utils.Get2HopRunnable]线程47执行完毕，time consumed :1240ms.  i=0
+ [INFO] [2016-05-14 07:22:11][com.test.utils.PathFinder]instance (1,1,1)--(1,5,11) done!
+ [INFO] [2016-05-14 07:22:11][com.test.utils.PathFinder]instance (2,6,1)--(5,11,1) find all a's related Ids :0  consumed:1853ms
+ [INFO] [2016-05-14 07:22:11][com.test.utils.Get2HopRunnable]线程48执行完毕，time consumed :1855ms.  i=0
+ [INFO] [2016-05-14 07:22:11][com.test.utils.Get2HopRunnable]线程49执行完毕，time consumed :1855ms.  i=0
+ [INFO] [2016-05-14 07:22:11][com.test.utils.Get2HopRunnable]线程50执行完毕，time consumed :1856ms.  i=0
+ [INFO] [2016-05-14 07:22:11][com.test.utils.PathFinder]instance (2,6,1)--(5,11,1) done!
+ [INFO] [2016-05-14 07:22:11][com.test.utils.PathFinder]end with 3-hops paths /////////////////////////
+ [INFO] [2016-05-14 07:22:11][com.test.utils.PathFinder]find 3-hop cost :1856ms
+ [INFO] [2016-05-14 07:22:11][com.test.jersey_webapp.MyResource]===================find:
+[[2332023333,1158167855,2310280492]]
+ [INFO] [2016-05-14 07:22:12][com.test.jersey_webapp.MyResource]******************************************************************
+logger info output!-----------[id1,id2]:[2332023333,57898110]
+ [INFO] [2016-05-14 07:22:12][com.test.utils.PathFinder]------------B     CASE----------------
+ [INFO] [2016-05-14 07:22:13][com.test.utils.PathFinder]find 1-hop cost :572ms
+ [INFO] [2016-05-14 07:22:13][com.test.utils.PathFinder]find 2-hop cost :847ms
+ [INFO] [2016-05-14 07:22:13][com.test.utils.PathFinder]start with 3-hops paths /////////////////////////
+ [INFO] [2016-05-14 07:22:14][com.test.utils.PathFinder]instance (1,1,5)--(5,11,5) find all a's related Ids consumed:1767ms
+ [INFO] [2016-05-14 07:22:20][com.test.utils.Get2HopRunnable]线程53执行完毕，time consumed :7291ms.  i=5
+ [INFO] [2016-05-14 07:22:20][com.test.utils.Get2HopRunnable]线程51执行完毕，time consumed :7558ms.  i=6
+ [INFO] [2016-05-14 07:22:20][com.test.utils.Get2HopRunnable]线程52执行完毕，time consumed :7748ms.  i=6
+ [INFO] [2016-05-14 07:22:20][com.test.utils.PathFinder]instance (5,9,10) done! time consumed:7749ms
+ [INFO] [2016-05-14 07:22:20][com.test.utils.PathFinder]end with 3-hops paths /////////////////////////
+ [INFO] [2016-05-14 07:22:20][com.test.utils.PathFinder]find 3-hop cost :7749ms
+ [INFO] [2016-05-14 07:22:20][com.test.jersey_webapp.MyResource]===================find:
+[[2332023333,1158167855,2310280492,57898110]]
+ [INFO] [2016-05-14 07:22:20][com.test.jersey_webapp.MyResource]******************************************************************
+logger info output!-----------[id1,id2]:[57898110,2014261844]
+ [INFO] [2016-05-14 07:22:21][com.test.utils.PathFinder]------------D     CASE----------------
+ [INFO] [2016-05-14 07:22:21][com.test.utils.PathFinder]find 1-hop cost :0ms
+ [INFO] [2016-05-14 07:22:22][com.test.utils.PathFinder]instance (9,10) aAfIds:91712215
+ [INFO] [2016-05-14 07:22:22][com.test.utils.PathFinder]instance (9,10) aAfIds:1343180700
+ [INFO] [2016-05-14 07:22:22][com.test.utils.PathFinder]instance (9,10) aAfIds:4923324
+ [INFO] [2016-05-14 07:22:22][com.test.utils.PathFinder]instance (9,10) bAfIds:91712215
+ [INFO] [2016-05-14 07:22:22][com.test.utils.PathFinder]instance (9,10) bAfIds:4923324
+ [INFO] [2016-05-14 07:22:22][com.test.utils.PathFinder]instance (9,10) common Ids:91712215
+ [INFO] [2016-05-14 07:22:22][com.test.utils.PathFinder]instance (9,10) common Ids:4923324
+ [INFO] [2016-05-14 07:22:22][com.test.utils.PathFinder]find 2-hop cost :1187ms
+ [INFO] [2016-05-14 07:22:22][com.test.utils.PathFinder]start with 3-hops paths /////////////////////////
+ [INFO] [2016-05-14 07:22:23][com.test.utils.PathFinder]instance (11,1,5) find all b's related Ids consumed:1642ms
+ [INFO] [2016-05-14 07:22:34][com.test.utils.Get2HopRunnable]线程55执行完毕，time consumed :13443ms.  i=33
+ [INFO] [2016-05-14 07:22:34][com.test.utils.Get2HopRunnable]线程56执行完毕，time consumed :13467ms.  i=32
+ [INFO] [2016-05-14 07:22:34][com.test.utils.Get2HopRunnable]线程54执行完毕，time consumed :13541ms.  i=34
+ [INFO] [2016-05-14 07:22:34][com.test.utils.PathFinder]instance (11,1,5) done! consumed:13541ms
+ [INFO] [2016-05-14 07:22:34][com.test.utils.PathFinder]end with 3-hops paths /////////////////////////
+ [INFO] [2016-05-14 07:22:34][com.test.utils.PathFinder]find 3-hop cost :13542ms
+ [INFO] [2016-05-14 07:22:34][com.test.jersey_webapp.MyResource]===================find:
+[[57898110,91712215,2014261844],[57898110,4923324,2014261844],[57898110,2052243599,2014261844],[57898110,2150635919,2014261844],[57898110,2080526711,2014261844],[57898110,2251676003,2014261844],[57898110,1807911131,2014261844],[57898110,2310280492,2014261844],[57898110,2261888986,2014261844],[57898110,1808135090,2014261844],[57898110,2180648442,2014261844],[57898110,2052207545,2014261844],[57898110,2294471017,2014261844],[57898110,2179812682,2014261844],[57898110,2296127659,2014261844],[57898110,2296099950,2014261844],[57898110,2249684012,2014261844],[57898110,2150635919,2114621449,2014261844],[57898110,2150635919,2143039717,2014261844],[57898110,2080526711,2149284486,2014261844],[57898110,2251676003,2149284486,2014261844],[57898110,2052207545,2149284486,2014261844],[57898110,2150635919,1988539193,2014261844],[57898110,2080526711,2048359624,2014261844],[57898110,2080526711,2052243599,2014261844],[57898110,1807911131,2052243599,2014261844],[57898110,2052207545,2052243599,2014261844]]
+ 
