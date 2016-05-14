@@ -643,8 +643,8 @@ public class PathFinder {
 			//[end]
 		}else{                        //D case:[AA.AuId,AA.AuId]
 			//[start] D case
-			JSONObject ajson = httpService("Composite(And(AA.AuId="+ a +",AA.AfN=''...))");
-			JSONObject bjson = httpService("Composite(And(AA.AuId="+ b +",AA.AfN=''...))");
+			JSONObject ajson = httpService("Composite(AA.AuId="+ a +")");
+			JSONObject bjson = httpService("Composite(AA.AuId="+ b +")");
 			try {
 				if(ajson.getJSONArray("entities").length() == 0 || bjson.getJSONArray("entities").length() == 0 ){
 					//System.out.println("now 2-hop D case has empty.ids:["+ a +","+ b +"]");
@@ -669,8 +669,8 @@ public class PathFinder {
 				while(i < aEntitiesArray.length()){
 					JSONArray AAArray = aEntitiesArray.getJSONObject(i).getJSONArray("AA");
 					for(j = 0;j < AAArray.length();j++){
-						if(a == AAArray.getJSONObject(j).getLong("AuId")){
-							aAfId.add(AAArray.getJSONObject(0).getLong("AfId"));
+						if(a == AAArray.getJSONObject(j).getLong("AuId") && AAArray.getJSONObject(j).has("AfId")){
+							aAfId.add(AAArray.getJSONObject(j).getLong("AfId"));
 							break;
 						}
 					}
@@ -680,8 +680,8 @@ public class PathFinder {
 				while(i < bEntitiesArray.length()){
 					JSONArray AAArray = bEntitiesArray.getJSONObject(i).getJSONArray("AA");
 					for(j = 0;j < AAArray.length();j++){
-						if(a == AAArray.getJSONObject(j).getLong("AuId")){
-							bAfId.add(AAArray.getJSONObject(0).getLong("AfId"));
+						if(b == AAArray.getJSONObject(j).getLong("AuId") && AAArray.getJSONObject(j).has("AfId")){
+							bAfId.add(AAArray.getJSONObject(j).getLong("AfId"));
 							break;
 						}
 					}
@@ -693,12 +693,12 @@ public class PathFinder {
 				ArrayList<Long> bAfIdList = new ArrayList<Long>();
 				while(iterator.hasNext()){
 					long al = iterator.next();
-//					logger.info("instance (9,10) aAfIds:"+ al);
+					logger.info("instance (9,10) aAfIds:"+ al);
 					aAfIdList.add(al);
 				}
 				while(iterator2.hasNext()){
 					long bl = iterator2.next();
-//					logger.info("instance (9,10) bAfIds:"+ bl);
+					logger.info("instance (9,10) bAfIds:"+ bl);
 					bAfIdList.add(bl);
 				}
 				for(i = 0;i < aAfIdList.size();i++){
@@ -711,7 +711,7 @@ public class PathFinder {
 							temp.put(aAfIdList.get(i));
 							temp.put(b);
 							jsonArray.put(temp);
-//							logger.info("instance (9,10) common Ids:"+ aAfIdList.get(i));
+							logger.info("instance (9,10) common Ids:"+ aAfIdList.get(i));
 							break;
 						}
 					}
@@ -725,10 +725,9 @@ public class PathFinder {
 			 * instance (11,5)
 			 * todo: find all paper both has a and b
 			 * */
-			JSONObject jsonObject = httpService("Composite(AA.AuId="+a+")");
 			JSONArray entitiesArray = new JSONArray();
 			try {
-				entitiesArray = jsonObject.getJSONArray("entities");
+				entitiesArray = ajson.getJSONArray("entities");
 				for(int i = 0;i < entitiesArray.length();i++){
 					JSONArray aAAArray = entitiesArray.getJSONObject(i).getJSONArray("AA");
 					for(int j = 0;j < aAAArray.length();j++){
