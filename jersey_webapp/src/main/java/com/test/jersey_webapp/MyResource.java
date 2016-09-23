@@ -56,6 +56,8 @@ public class MyResource {
          user.setName("snail");
          user.setAge("22");
          user.setSex("male");
+         int a= 0;
+         a = 626/0;
 	} catch (Exception e) {
 		// TODO: handle exception
 	}
@@ -63,15 +65,4 @@ public class MyResource {
      return user;
     }
     
-    @GET
-    @Path("/getUserJson")
-    @Consumes(MediaType.APPLICATION_JSON)
-    @Produces(MediaType.APPLICATION_JSON)
-    public User getUserJson(@QueryParam("query") JSONObject query) throws JSONException {
-    	User user  = new User();
-    	user.setAge(query.getString("age"));
-    	user.setName(query.getString("name"));
-    	user.setSex(query.getString("sex"));
-    	return user;
-    }
 }
